@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "449487130053",
+    "firebase_url": "https://mvtest-45394-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "mvtest-45394",
+    "storage_bucket": "mvtest-45394.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:449487130053:android:3130295406f4ab77ba0fac",
+        "android_client_info": {
+          "package_name": "com.example.smartparkingfinder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "449487130053-aq2vmrcq5o6bqgk2dgahs081lughqn5g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCx3EiVq7e90I-Ql4WN8vYcVJgESOPehK0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "449487130053-aq2vmrcq5o6bqgk2dgahs081lughqn5g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

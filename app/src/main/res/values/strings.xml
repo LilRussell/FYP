@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">SmartParkingFinder</string>
+    <string name="login">Welcome to Smart Parking Finder System</string>
+    <string name="login_btn">Login</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="register">Register</string>
+    <string name="sign_up_now">Sign Up Now!</string>
+    <string name="car_register">Car Register</string>
+    <string name="history">History</string>
+    <string name="home">Home</string>
+    <string name="add_location">+</string>
+    <string name="profile">Profile</string>
+    <string name="location">Location:</string>
+    <string name="parking_available">Parking Available:</string>
+    <string name="enter_location_name">Enter location name:</string>
+    <string name="enter_location_description">Enter Location Description:</string>
+    <string name="save">Save</string>
+</resources>
