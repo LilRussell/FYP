@@ -36,6 +36,7 @@
             android:id="@+id/txtEdit_email"
             android:textColor="@color/white"
             android:hint="@string/email"
+            android:text="admin1@gmail.com"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             />
@@ -49,6 +50,7 @@
             android:id="@+id/txtEdit_password"
             android:textColor="@color/white"
             android:hint="@string/password"
+            android:text="123456"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             />

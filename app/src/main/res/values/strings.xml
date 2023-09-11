@@ -17,4 +17,10 @@
     <string name="enter_location_description">Enter Location Description:</string>
     <string name="save">Save</string>
     <string name="description">Description</string>
+    <string name="delete_location">Delete Location</string>
+    <string name="edit_location">Edit Location Details</string>
+    <string name="edit_parking_layout">Edit Parking Layout</string>
+    <string name="add_floor">Add Floor</string>
+    <string name="delete">Delete</string>
+    <string name="pillar_number">Pillar Number</string>
 </resources>
