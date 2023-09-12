@@ -21,7 +21,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ParkingLayout extends AppCompatActivity {
 
@@ -29,12 +31,14 @@ public class ParkingLayout extends AppCompatActivity {
     private ViewPager viewPager;
     private MyPagerAdapter adapter;
     private Button addTabButton;
+    private Button addParkingBox;
     private ImageView leftIndicator;
     private ImageView rightIndicator;
 
     private List<String> tabTitles = new ArrayList<>();
     private List<Fragment> tabFragments = new ArrayList<>();
     private int tabCount = 0; // To keep track of the number of tabs
+    private int getCardCount =0;
     private String locationId;
     private boolean isFirstLoad = true;
     @Override
@@ -46,6 +50,7 @@ public class ParkingLayout extends AppCompatActivity {
         tabLayout = findViewById(R.id.tabLayout);
         viewPager = findViewById(R.id.viewPager);
         addTabButton = findViewById(R.id.addTabButton);
+        addParkingBox = findViewById(R.id.addParkingBox);
         leftIndicator = findViewById(R.id.leftIndicator);
         rightIndicator = findViewById(R.id.rightIndicator);
 
@@ -140,6 +145,47 @@ public class ParkingLayout extends AppCompatActivity {
             @Override
             public void onTabReselected(TabLayout.Tab tab) {}
         });
+        addParkingBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Get the currently selected tab's position
+                int selectedTabPosition = viewPager.getCurrentItem();
+
+                // Get the tab title based on the selected tab position
+                String selectedTabTitle = tabTitles.get(selectedTabPosition);
+
+                // Retrieve the tab ID from Firebase based on the selected tab title
+                DatabaseReference tabsRef = locationRef.child("details").child("layout").child("tabs");
+                tabsRef.orderByChild("title").equalTo(selectedTabTitle).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            // Iterate through the matching snapshots (there should be only one)
+                            for (DataSnapshot tabSnapshot : dataSnapshot.getChildren()) {
+                                String currentTabId = tabSnapshot.getKey();
+
+                                // Get the card text (e.g., "Pillar 1", "Pillar 2")
+                                String cardText = "Pillar 1";
+
+                                // Call the saveCardToFirebase function to save the card
+                                saveCardToFirebase(locationRef, currentTabId, cardText);
+
+                                // Update the fragment's UI to reflect the new card
+                                PageFragment selectedFragment = (PageFragment) adapter.getItem(selectedTabPosition);
+                                selectedFragment.addCardViewToContainer(cardText);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        // Handle any errors that may occur during the database query
+                        Log.e("FirebaseError", "Failed to retrieve tab ID: " + databaseError.getMessage());
+                    }
+                });
+            }
+        });
+
     }
 
     // Your FragmentPagerAdapter class here
@@ -181,6 +227,18 @@ public class ParkingLayout extends AppCompatActivity {
 
         // Save the tab title under the generated unique ID
         tabRef.setValue(tabTitle);
+    }
+    private void saveCardToFirebase(DatabaseReference locationRef, String currentTabId, String cardText) {
+        // Get a reference to the "cards" section under the selected tab
+        DatabaseReference cardsRef = locationRef.child("details").child("layout")
+                .child("tabs").child(currentTabId).child("cards");
+
+        // Generate a unique card ID using push()
+        DatabaseReference cardRef = cardsRef.push();
+        String cardId = cardRef.getKey();
+
+        // Set the card text under the generated card ID
+        cardRef.child("text").setValue(cardText);
     }
     private void loadTabs(int tabCount) {
         // Clear existing tabs before adding new ones
