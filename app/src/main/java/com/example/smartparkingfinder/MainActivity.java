@@ -2,6 +2,7 @@ package com.example.smartparkingfinder;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -15,11 +16,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity {
-
+    private Toolbar toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         DatabaseReference databaseReference;
         FirebaseApp.initializeApp(this);
 

@@ -23,4 +23,9 @@
     <string name="add_floor">Add Floor</string>
     <string name="delete">Delete</string>
     <string name="pillar_number">Pillar Number</string>
+    <string name="new_fragment">New Fragment</string>
+    <string name="addcard">addCard</string>
+    <string name="settings">Settings</string>
+    <string name="add_camera">Add Camera</string>
+    <string name="edit">Edit</string>
 </resources>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".TestingTab">
+    <include layout="@layout/toolbar"/>
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout_test"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="61dp"
+        app:tabMode="scrollable" />
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/viewPager_test"
+        android:layout_width="match_parent"
+        android:layout_height="553dp"
+        android:layout_above="@+id/addTab_test"
+        android:layout_below="@+id/tabLayout_test"
+        android:layout_marginBottom="8dp" />
+
+    <Button
+        android:id="@+id/addTab_test"
+        android:layout_width="124dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="136dp"
+        android:layout_marginEnd="151dp"
+        android:layout_marginBottom="13dp"
+        android:text="@string/add_floor" />
+
+    <Button
+        android:id="@+id/addCard_test"
+        android:layout_width="124dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="263dp"
+        android:layout_marginEnd="23dp"
+        android:layout_marginBottom="13dp"
+        android:text="@string/addcard" />
+
+
+</RelativeLayout>

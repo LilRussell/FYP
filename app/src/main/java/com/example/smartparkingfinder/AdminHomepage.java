@@ -1,17 +1,24 @@
 package com.example.smartparkingfinder;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -32,11 +39,16 @@ public class AdminHomepage extends AppCompatActivity {
     private Button addlocationBtn;
     private RecyclerView mRecyclerView;
     private adminadapter adapter;
-
+    private Toolbar toolbar;
+    private String adminId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_homepage);
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        adminId = getIntent().getStringExtra("adminId");
+        Log.d("CheckID", adminId);
 
         addlocationBtn = findViewById(R.id.add_btn);
         addlocationBtn.setOnClickListener(new View.OnClickListener() {
@@ -105,11 +117,29 @@ public class AdminHomepage extends AppCompatActivity {
         });
     }
 
-    private void showBottomSheetDialog(locationRVModel item) {
-        // Check if the activity is still alive
-        if (isFinishing()) {
-            return;
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater=getMenuInflater();
+        inflater.inflate(R.menu.toolbar_menu,menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.settings) {
+
+            return true;
+        } else if (id == R.id.add_camera) {
+            showInputDialog();
+            return true;
         }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void showBottomSheetDialog(locationRVModel item) {
+
         // Create and show the BottomSheetDialog here
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
         View view = getLayoutInflater().inflate(R.layout.bottom_sheet_dialog, null);
@@ -147,8 +177,9 @@ public class AdminHomepage extends AppCompatActivity {
                 // Handle Edit Parking Layout button click here
                 String selectedLocationId = item.getId();
                 // You can launch an edit parking layout activity or perform any other action
-                Intent intent = new Intent(AdminHomepage.this, ParkingLayout.class);
+                Intent intent = new Intent(AdminHomepage.this, TestingTab.class);
                 intent.putExtra("locationId", selectedLocationId);
+                intent.putExtra("adminId",adminId);
                 startActivity(intent);
 
             }
@@ -190,6 +221,53 @@ public class AdminHomepage extends AppCompatActivity {
         if (!isFinishing()) {
             bottomSheetDialog.show();
         }
+        if (isFinishing()) {
+            bottomSheetDialog.dismiss();
+        }
+
+    }
+    private void showInputDialog() {
+        // Create an AlertDialog builder
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        // Set dialog title and message
+        builder.setTitle("Input Dialog");
+        builder.setMessage("Please enter your text:");
+
+        // Create an EditText widget for text input
+        final EditText inputEditText = new EditText(this);
+        builder.setView(inputEditText);
+
+        // Set positive (OK) button action
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Handle OK button click
+                String userInput = inputEditText.getText().toString();
+
+                // Define the path where you want to store the camera name
+                DatabaseReference camerasRef = FirebaseDatabase.getInstance().getReference("camera").child(adminId).child(userInput).child("name");
+
+                // Set the camera name under the defined path
+                camerasRef.setValue(userInput);
+
+                // Close the dialog
+                dialog.dismiss();
+            }
+        });
+
+        // Set negative (Cancel) button action
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Handle Cancel button click or dismiss the dialog
+                dialog.dismiss();
+            }
+        });
+
+        // Create and show the dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
 }

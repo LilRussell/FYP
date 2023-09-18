@@ -1,5 +1,6 @@
 package com.example.smartparkingfinder;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -38,7 +39,6 @@ public class ParkingLayout extends AppCompatActivity {
     private List<String> tabTitles = new ArrayList<>();
     private List<Fragment> tabFragments = new ArrayList<>();
     private int tabCount = 0; // To keep track of the number of tabs
-    private int getCardCount =0;
     private String locationId;
     private boolean isFirstLoad = true;
     @Override
@@ -59,15 +59,11 @@ public class ParkingLayout extends AppCompatActivity {
         DatabaseReference locationRef = database.getReference("location").child(locationId);
 
         adapter = new MyPagerAdapter(getSupportFragmentManager());
-        viewPager.setAdapter(adapter);
-        tabLayout.setupWithViewPager(viewPager);
+
 
         // Initially, hide the scroll indicators
         leftIndicator.setVisibility(View.GONE);
         rightIndicator.setVisibility(View.GONE);
-
-
-
         // Listen for changes to tabs in Firebase and load the tabs
         locationRef.child("details").child("layout").child("tabs").addValueEventListener(new ValueEventListener() {
             @Override
@@ -87,11 +83,15 @@ public class ParkingLayout extends AppCompatActivity {
 
                     if (tabCount > 0) {
                         // Load the tabs based on the retrieved tab count
-                        loadTabs(tabCount);
+                        loadTabsFromFirebase(locationRef);
+
+                        viewPager.setOffscreenPageLimit(tabCount);
                     }
 
                     isFirstLoad = false; // Set the flag to false after the first load
                 }
+                viewPager.setAdapter(adapter);
+                tabLayout.setupWithViewPager(viewPager);
             }
 
             @Override
@@ -100,6 +100,10 @@ public class ParkingLayout extends AppCompatActivity {
                 Log.e("FirebaseError", "Failed to retrieve tabs: " + databaseError.getMessage());
             }
         });
+
+
+
+
         addTabButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -135,8 +139,10 @@ public class ParkingLayout extends AppCompatActivity {
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
+
                 // Update scroll indicators when a tab is selected
                 updateScrollIndicators();
+
             }
 
             @Override
@@ -145,6 +151,37 @@ public class ParkingLayout extends AppCompatActivity {
             @Override
             public void onTabReselected(TabLayout.Tab tab) {}
         });
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                // The 'position' parameter indicates the index of the selected tab
+                Log.d("TabSelected", "Selected tab index: " + position);
+
+                // Retrieve the fragment associated with the selected tab
+                PageFragment selectedFragment = (PageFragment) adapter.getItem(position);
+
+                if (selectedFragment != null) {
+                    // Check if the fragment is newly created
+                    if (selectedFragment.isFragmentCreated) {
+                        Log.d("FragmentSelected", "Newly created fragment");
+                        // Perform actions specific to a newly created fragment
+                        selectedFragment.isFragmentCreated = false; // Reset the flag
+                    } else {
+                        Log.d("FragmentSelected", "Fragment was not recreated");
+                        // Perform actions for a fragment that was not recreated
+                    }
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
+
         addParkingBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -152,50 +189,46 @@ public class ParkingLayout extends AppCompatActivity {
                 int selectedTabPosition = viewPager.getCurrentItem();
 
                 // Get the tab title based on the selected tab position
-                String selectedTabTitle = tabTitles.get(selectedTabPosition);
+                String selectedTabTitle = "Floor "+ (selectedTabPosition+1);
+                Log.d("Tab", selectedTabTitle);
 
-                // Retrieve the tab ID from Firebase based on the selected tab title
-                DatabaseReference tabsRef = locationRef.child("details").child("layout").child("tabs");
-                tabsRef.orderByChild("title").equalTo(selectedTabTitle).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            // Iterate through the matching snapshots (there should be only one)
-                            for (DataSnapshot tabSnapshot : dataSnapshot.getChildren()) {
-                                String currentTabId = tabSnapshot.getKey();
+                // Check if the PageFragment is attached to an activity
+                PageFragment selectedFragment = (PageFragment) adapter.getItem(selectedTabPosition);
 
-                                // Get the card text (e.g., "Pillar 1", "Pillar 2")
-                                String cardText = "Pillar 1";
+                    // Retrieve the tab ID from Firebase based on the selected tab title
+                    DatabaseReference tabsRef = locationRef.child("details").child("layout").child("tabs");
+                    tabsRef.child(selectedTabTitle).equalTo(selectedTabTitle).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Log.d("tabsRef","OK");
+                            // Get the card text (e.g., "Pillar 1", "Pillar 2")
+                            String cardText = "Pillar 1";
+                            // Call the saveCardToFirebase function to save the card
+                            saveCardToFirebase(locationRef, selectedTabTitle, cardText);
+                            // Update the fragment's UI to reflect the new card
+                            PageFragment selectedFragment = (PageFragment) adapter.getItem(selectedTabPosition);
+                            //selectedFragment.addCardViewToContainer(cardText);
+                            Log.d("TabRef", tabsRef.toString());
 
-                                // Call the saveCardToFirebase function to save the card
-                                saveCardToFirebase(locationRef, currentTabId, cardText);
 
-                                // Update the fragment's UI to reflect the new card
-                                PageFragment selectedFragment = (PageFragment) adapter.getItem(selectedTabPosition);
-                                selectedFragment.addCardViewToContainer(cardText);
-                            }
                         }
-                    }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        // Handle any errors that may occur during the database query
-                        Log.e("FirebaseError", "Failed to retrieve tab ID: " + databaseError.getMessage());
-                    }
-                });
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            // Handle any errors that may occur during the database query
+                            Log.e("FirebaseError", "Failed to retrieve tab ID: " + databaseError.getMessage());
+                        }
+                    });
+
             }
         });
 
+
     }
-
-    // Your FragmentPagerAdapter class here
-    // ...
-
     private void updateScrollIndicators() {
         // Check if the TabLayout is scrollable
         boolean isScrollable = isTabLayoutScrollable(tabLayout);
         // Log the scrollability status
-        Log.d("TabScroll", "Is Scrollable: " + isScrollable);
         // Show/hide the indicators based on scrollability
         leftIndicator.setVisibility(isScrollable ? View.VISIBLE : View.GONE);
         rightIndicator.setVisibility(isScrollable ? View.VISIBLE : View.GONE);
@@ -222,46 +255,91 @@ public class ParkingLayout extends AppCompatActivity {
     }
 
     private void saveTabToFirebase(DatabaseReference locationRef, String tabTitle) {
-        // Generate a unique ID for the tab using push()
-        DatabaseReference tabRef = locationRef.child("details").child("layout").child("tabs").push();
+        // Set the tab title as the key in Firebase
+        DatabaseReference tabRef = locationRef.child("details").child("layout").child("tabs").child(tabTitle);
 
-        // Save the tab title under the generated unique ID
-        tabRef.setValue(tabTitle);
+        // Save the tab title
+        tabRef.child("name").setValue(tabTitle);
     }
     private void saveCardToFirebase(DatabaseReference locationRef, String currentTabId, String cardText) {
         // Get a reference to the "cards" section under the selected tab
         DatabaseReference cardsRef = locationRef.child("details").child("layout")
-                .child("tabs").child(currentTabId).child("cards");
-
+                .child("tabs").child(currentTabId).child("card");
+        Log.d("saveCard",cardsRef.toString());
         // Generate a unique card ID using push()
         DatabaseReference cardRef = cardsRef.push();
-        String cardId = cardRef.getKey();
 
         // Set the card text under the generated card ID
         cardRef.child("text").setValue(cardText);
     }
-    private void loadTabs(int tabCount) {
-        // Clear existing tabs before adding new ones
-        tabTitles.clear();
-        tabFragments.clear();
+    private void loadTabsFromFirebase(DatabaseReference locationRef) {
+        locationRef.child("details").child("layout").child("tabs").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                int tabCount = (int) dataSnapshot.getChildrenCount(); // Get the number of tabs from Firebase
 
-        for (int i = 0; i < tabCount; i++) {
-            // Generate tab title, e.g., "Floor 1", "Floor 2", ...
-            String tabTitle = "Floor " + (i + 1);
+                // Clear existing tabs before adding new ones
+                tabTitles.clear();
+                tabFragments.clear();
 
-            // Create a new fragment and add it to the adapter
-            PageFragment newFragment = new PageFragment();
-            adapter.addFragment(newFragment, tabTitle);
+                for (DataSnapshot tabSnapshot : dataSnapshot.getChildren()) {
+                    // Get the tab title (name) from Firebase
+                    String tabTitle = tabSnapshot.child("name").getValue(String.class);
 
-            // Notify the adapter that the dataset has changed
-            adapter.notifyDataSetChanged();
+                    // Create a new fragment and add it to the adapter
+                    PageFragment newFragment = new PageFragment();
+                    adapter.addFragment(newFragment, tabTitle);
+                    tabFragments.add(newFragment);
 
-            // Add the tab title to your list
-            tabTitles.add(tabTitle);
-            tabFragments.add(newFragment); // Log statement added here
-            Log.d("FragmentCreation", "Fragment created: " + tabTitle);
-            // You might also want to add the fragment to your list if needed
-            // tabFragments.add(newFragment);
-        }
+                    // Load card data for this tab
+                    loadCardDataForTab(tabSnapshot.getRef(), newFragment);
+
+                    // Add the tab title to your list
+                    tabTitles.add(tabTitle);
+
+                    // Log statement added here
+                    Log.d("FragmentCreation", "Fragment created: " + tabTitle);
+                }
+
+                // Set the tab count in your activity
+                updateTabCount(tabCount);
+
+                // Notify the adapter that the dataset has changed
+                adapter.notifyDataSetChanged();
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Handle any errors that may occur during the database query
+                Log.e("FirebaseError", "Failed to retrieve tabs: " + databaseError.getMessage());
+            }
+        });
+    }
+    private void loadCardDataForTab(DatabaseReference tabRef, PageFragment fragment) {
+        tabRef.child("card").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Iterate through the card data for this tab
+                for (DataSnapshot cardSnapshot : dataSnapshot.getChildren()) {
+                    // Get the card text from Firebase
+                    String cardText = cardSnapshot.child("text").getValue(String.class);
+
+                    // Load the card data into the corresponding fragment
+                   if( fragment.getView()!=null){
+                    //   fragment.addCardViewToContainer(cardText);
+                   }
+                   else{
+                       Log.d("CV","View is Null");
+                   }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Handle any errors that may occur during the database query
+                Log.e("FirebaseError", "Failed to retrieve card data: " + databaseError.getMessage());
+            }
+        });
     }
 }
