@@ -46,7 +46,6 @@ public class TestingTab extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
         addTabButton = findViewById(R.id.addTab_test);
         addCardButton = findViewById(R.id.addCard_test);
-
         // Load tab data and cards for each tab from Firebase
         loadTabsAndCardsFromFirebase(locationRef);
         addTabButton.setOnClickListener(new View.OnClickListener() {
@@ -81,7 +80,9 @@ public class TestingTab extends AppCompatActivity {
         // Create a new fragment for the tab content and add it to the adapter
         TestFragment fragment = new TestFragment();
         Bundle args = new Bundle();
-        args.putString("tabTitle", tabId); // Use the retrieved tab ID as the tab title
+        args.putString("tabTitle", tabId);
+        args.putString("locationId", locationId);
+        // Use the retrieved tab ID as the tab title
         fragment.setArguments(args);
 
         // Add the fragment to the adapter and notify the adapter of the data set change
@@ -94,7 +95,9 @@ public class TestingTab extends AppCompatActivity {
         TestFragment fragment = new TestFragment();
         Bundle args = new Bundle();
         count++;
-        args.putString("tabTitle", "Tab "+ count); // Replace "Tab 1" with the actual tab title
+        args.putString("locationId", locationId); // Pass the locationId
+        args.putString("tabTitle", "Tab " + count); // Generate a unique tab title
+        fragment.setArguments(args); // Replace "Tab 1" with the actual tab title
         viewPager.setOffscreenPageLimit(Count);
         fragment.setArguments(args);// Generate a unique tab title
         adapter.addFragment(fragment, "Floor "+count);

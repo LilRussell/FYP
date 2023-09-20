@@ -5,13 +5,17 @@ import android.content.Intent;
 import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +30,7 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -41,6 +46,8 @@ public class AdminHomepage extends AppCompatActivity {
     private adminadapter adapter;
     private Toolbar toolbar;
     private String adminId;
+    private FirebaseAuth mAuth;
+    private FrameLayout radioGroupContainer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +56,8 @@ public class AdminHomepage extends AppCompatActivity {
         setSupportActionBar(toolbar);
         adminId = getIntent().getStringExtra("adminId");
         Log.d("CheckID", adminId);
-
+        mAuth = FirebaseAuth.getInstance();
+        radioGroupContainer = findViewById(R.id.radioGroupContainer);
         addlocationBtn = findViewById(R.id.add_btn);
         addlocationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,6 +140,9 @@ public class AdminHomepage extends AppCompatActivity {
             return true;
         } else if (id == R.id.add_camera) {
             showInputDialog();
+            return true;
+        }else if (id==R.id.tb_logout){
+            logout();
             return true;
         }
 
@@ -226,6 +237,18 @@ public class AdminHomepage extends AppCompatActivity {
         }
 
     }
+    // To logout the user
+    private void logout() {
+        mAuth.signOut();
+
+        // After signing out, you can redirect the user to the login screen or perform any other actions you need.
+        // For example, you can start a LoginActivity:
+        Intent intent = new Intent(this, Login.class);
+        startActivity(intent);
+
+        // Make sure to finish the current activity to prevent the user from navigating back to it.
+        finish();
+    }
     private void showInputDialog() {
         // Create an AlertDialog builder
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -269,5 +292,6 @@ public class AdminHomepage extends AppCompatActivity {
         AlertDialog dialog = builder.create();
         dialog.show();
     }
+
 
 }

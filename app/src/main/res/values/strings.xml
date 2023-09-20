@@ -28,4 +28,11 @@
     <string name="settings">Settings</string>
     <string name="add_camera">Add Camera</string>
     <string name="edit">Edit</string>
+    <string name="logout">LogOut</string>
+    <string name="normal_parking">Normal Parking</string>
+    <string name="disabled_parking">Disabled Parking</string>
+    <string name="reserved_parking">Reserved Parking</string>
+    <string name="family_parking">Family Parking</string>
+    <string name="ladies_parking">Ladies Parking</string>
+    <string name="not_available">Not Available</string>
 </resources>

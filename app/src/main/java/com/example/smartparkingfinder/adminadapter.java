@@ -53,7 +53,7 @@ public class adminadapter extends RecyclerView.Adapter<adminadapter.ViewHolder> 
             @Override
             public void onClick(View v) {
                 if (listener != null) {
-                    listener.   onItemClick(locationRVModel);
+                    listener.onItemClick(locationRVModel);
                 }
             }
         });

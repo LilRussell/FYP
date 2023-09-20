@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/radioGroup_ImgParking"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <RadioButton
+        android:id="@+id/radioButtonOption1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/normal_parking" />
+
+    <RadioButton
+        android:id="@+id/radioButtonOption2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/disabled_parking" />
+    <RadioButton
+        android:id="@+id/radioButtonOption3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/reserved_parking" />
+    <RadioButton
+        android:id="@+id/radioButtonOption4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/family_parking" />
+    <RadioButton
+        android:id="@+id/radioButtonOption5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/ladies_parking" />
+    <RadioButton
+        android:id="@+id/radioButtonOption6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/not_available" />
+
+
+</RadioGroup>

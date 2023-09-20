@@ -8,6 +8,11 @@
     <item
         android:id="@+id/add_camera"
         android:title="@string/add_camera" />
+<item
+    android:id="@+id/tb_logout"
+    android:icon="@drawable/ic_baseline_login_24"
+    app:showAsAction="ifRoom"
+    android:title="@string/logout" />
 
 
 </menu>
