@@ -269,10 +269,10 @@ public class AdminHomepage extends AppCompatActivity {
                 String userInput = inputEditText.getText().toString();
 
                 // Define the path where you want to store the camera name
-                DatabaseReference camerasRef = FirebaseDatabase.getInstance().getReference("camera").child(adminId).child(userInput).child("name");
+                DatabaseReference camerasRef = FirebaseDatabase.getInstance().getReference("camera").child(userInput).child("ownedBy");
 
                 // Set the camera name under the defined path
-                camerasRef.setValue(userInput);
+                camerasRef.setValue(adminId);
 
                 // Close the dialog
                 dialog.dismiss();

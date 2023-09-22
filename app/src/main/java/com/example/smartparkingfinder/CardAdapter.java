@@ -1,5 +1,4 @@
 package com.example.smartparkingfinder;
-
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,21 +7,18 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 import java.util.List;
-
 public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder> {
 
     private List<CardItem> cardItemList;
@@ -72,53 +68,41 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
         String currentCardId = cardItem.getCardId();
 
         // Add an OnClickListener to the button inside the CardView
-        Button button = holder.itemView.findViewById(R.id.btn_chg_parking1);
-        button.setOnClickListener(new View.OnClickListener() {
+        Button button1 = holder.itemView.findViewById(R.id.btn_chg_parking1);
+        Button button2 = holder.itemView.findViewById(R.id.btn_chg_parking2);
+        Button button3 = holder.itemView.findViewById(R.id.btn_chg_parking3);
+
+        button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Call the showRadioButtonDialog function when the button is clicked
-                // Get the position of the clicked item
-                int position = holder.getAdapterPosition();
-
-                if (position != RecyclerView.NO_POSITION) {
-                    CardItem cardItem = cardItemList.get(position);
-
-                    // Use cardItem data to construct the Firebase query
-                    DatabaseReference cardRef = FirebaseDatabase.getInstance().getReference()
-                            .child("location")
-                            .child("-Ndy9UWdeyWYe9JMziIJ")
-                            .child("details")
-                            .child("layout")
-                            .child("Floor 0")
-                            .child("card");
-
-                    // Add a ValueEventListener to fetch the card ID
-                    cardRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            for (DataSnapshot cardSnapshot : dataSnapshot.getChildren()) {
-                                String cardId = cardSnapshot.getKey();
-
-                                // Display the card ID in a Toast message
-                                Toast.makeText(v.getContext(), "Card ID: " + cardId, Toast.LENGTH_SHORT).show();
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                            // Handle error
-                        }
-                    });
-                }
-
-
-
                 if (testFragment != null) {
-                    testFragment.showRadioButtonDialog(currentCardId); // Pass the card ID
-                    Log.d("cardID",currentCardId);
+                    String slot = "cardP1";
+                    testFragment.showRadioButtonDialog(currentCardId,slot); // Pass the card ID
+                    Log.d("cardID", currentCardId);
                 }
             }
         });
+        button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (testFragment != null) {
+                    String slot = "cardP2";
+                    testFragment.showRadioButtonDialog(currentCardId,slot); // Pass the card ID
+                    Log.d("cardID", currentCardId);
+                }
+            }
+        });
+        button3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (testFragment != null) {
+                    String slot = "cardP3";
+                    testFragment.showRadioButtonDialog(currentCardId,slot); // Pass the card ID
+                    Log.d("cardID", currentCardId);
+                }
+            }
+        });
+
     }
 
     @Override
@@ -128,14 +112,46 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
 
     public class CardViewHolder extends RecyclerView.ViewHolder {
         private EditText mEditText;
+        private ImageView img1,img2,img3;
 
         public CardViewHolder(View itemView) {
             super(itemView);
             mEditText = itemView.findViewById(R.id.editPillarName);
+            img1 = itemView.findViewById(R.id.IV_Parking1);
+            img2 = itemView.findViewById(R.id.IV_Parking2);
+            img3 = itemView.findViewById(R.id.IV_Parking3);
+
         }
 
         public void bind(CardItem cardItem) {
             mEditText.setText(cardItem.getCardText());
+            setImageResourceBasedOnCardP(img1, cardItem.getCardP1());
+            setImageResourceBasedOnCardP(img2, cardItem.getCardP2());
+            setImageResourceBasedOnCardP(img3, cardItem.getCardP3());
         }
+    }
+
+
+
+
+    private void setImageResourceBasedOnCardP(ImageView imageView, String cardP) {
+        int imageResource;
+
+        switch (cardP) {
+            case "Normal Parking":
+                imageResource = R.drawable.image_grn;
+                break;
+            case "Disabled Parking":
+                imageResource = R.drawable.image_oku_grn;
+                break;
+            case "Reserved Parking":
+                imageResource = R.drawable.image_rsv;
+                break;
+            default:
+                imageResource = R.drawable.image_na;
+                break;
+        }
+
+        imageView.setImageResource(imageResource);
     }
 }

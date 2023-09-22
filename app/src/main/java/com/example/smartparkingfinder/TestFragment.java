@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -33,7 +34,7 @@ public class TestFragment extends Fragment {
     private List<String> cameraNames;
     private TestFragment fragment;
     private String currentCardId; // Store the current card ID
-
+    private String parkingSlot;
     public TestFragment() {
         // Required empty public constructor
     }
@@ -56,7 +57,7 @@ public class TestFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
         // Fetch camera names from Firebase
-        DatabaseReference camerasRef = FirebaseDatabase.getInstance().getReference("camera").child("P8keeLX1JLSM8NBa6PiE2O8vtWW2");
+        DatabaseReference camerasRef = FirebaseDatabase.getInstance().getReference("camera").child("ownedBy");
         camerasRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -75,10 +76,7 @@ public class TestFragment extends Fragment {
                 recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
                 recyclerView.setAdapter(adapter);
 
-                // Add camera names to the RecyclerView
-                for (String cameraName : cameraNames) {
-                    addCardToRecyclerView(cameraName);
-                }
+
             }
 
             @Override
@@ -87,13 +85,16 @@ public class TestFragment extends Fragment {
             }
         });
 
+
+
+
         return view;
     }
 
-    void showRadioButtonDialog(String cardId) {
+    void showRadioButtonDialog(String cardId,String Slot) {
         // Store the current card ID
         currentCardId = cardId;
-
+        parkingSlot = Slot;
         // Create an AlertDialog builder
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
 
@@ -118,8 +119,12 @@ public class TestFragment extends Fragment {
                             Toast.makeText(requireContext(), "Selected option: " + selectedOptionText, Toast.LENGTH_SHORT).show();
 
                             // Save the selected option to Firebase using the currentCardId
-                            saveSelectedOptionToFirebase(currentCardId, selectedOptionText);
-                            Log.d("cardID",currentCardId);                        }
+                            saveSelectedOptionToFirebase(currentCardId, selectedOptionText,parkingSlot);
+                            Log.d("cardID",currentCardId);
+                            // Update the image immediately based on the selected option
+                            updateImageBasedOnOption(selectedOptionText,parkingSlot);
+
+                        }
                         dialog.dismiss();
                     }
                 })
@@ -135,8 +140,25 @@ public class TestFragment extends Fragment {
         AlertDialog dialog = builder.create();
         dialog.show();
     }
+    private void updateImageBasedOnOption(String selectedOptionText, String parkingSlot) {
+        // Find the ImageView within the current CardView and update its image
+        for (CardItem cardItem : cardItemList) {
+            if (cardItem.getCardId().equals(currentCardId)) {
+                if(parkingSlot.equals("cardP1")){
+                    cardItem.setCardP1(selectedOptionText);
+                }
+                if(parkingSlot.equals("cardP2")){
+                    cardItem.setCardP2(selectedOptionText);
+                }
+                if(parkingSlot.equals("cardP3")){
+                    cardItem.setCardP3(selectedOptionText);
+                }
 
-    private void saveSelectedOptionToFirebase(String cardId, String selectedOptionText) {
+            } adapter.notifyDataSetChanged();
+        }
+    }
+
+    private void saveSelectedOptionToFirebase(String cardId, String selectedOptionText,String Slot) {
         Bundle args = getArguments(); // Retrieve fragment's arguments
         if (args != null) {
             String locationId = args.getString("locationId");
@@ -152,7 +174,7 @@ public class TestFragment extends Fragment {
                         .child(tabTitle)
                         .child("card")
                         .child(cardId)
-                        .child("img1");
+                        .child(Slot);
 
                 // Set the selected option in Firebase
                 selectedOptionRef.setValue(selectedOptionText);
@@ -161,9 +183,8 @@ public class TestFragment extends Fragment {
     }
 
     // Method to add a new card item to the RecyclerView
-    public void addCardToRecyclerView(String cardText) {
-        // Create a new CardItem and add it to the adapter's data list
-        CardItem cardItem = new CardItem("",cardText);
+    public void addCardToRecyclerView(CardItem cardItem) {
+        // Add the provided CardItem to the adapter's data list
         cardItemList.add(cardItem);
 
         // Notify the adapter of the data change
