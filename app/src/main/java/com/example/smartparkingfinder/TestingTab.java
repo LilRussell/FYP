@@ -151,6 +151,8 @@ public class TestingTab extends AppCompatActivity {
         Bundle args = new Bundle();
         args.putString("locationId", locationId); // Pass the locationId
         args.putString("tabTitle", tabId); // Generate a unique tab title
+        String adminIdToCard = adminId; // Replace with the actual admin ID
+        args.putString("adminIdKey", adminIdToCard);
         fragment.setArguments(args);
 
         // Add the fragment to the adapter and notify the adapter of the data set change
@@ -164,6 +166,8 @@ public class TestingTab extends AppCompatActivity {
         Bundle args = new Bundle();
         args.putString("locationId", locationId); // Pass the locationId
         args.putString("tabTitle", title); // Generate a unique tab title
+        String adminIdToCard = adminId; // Replace with the actual admin ID
+        args.putString("adminIdKey", adminIdToCard);
         fragment.setArguments(args); // Replace "Tab 1" with the actual tab title
         viewPager.setOffscreenPageLimit(Count);
         fragment.setArguments(args);// Generate a unique tab title
@@ -247,7 +251,7 @@ public class TestingTab extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot cardSnapshot : dataSnapshot.getChildren()) {
                     String cardId = cardSnapshot.getKey(); // Get the unique card ID
-                    String cardText = cardSnapshot.child("text").getValue(String.class);
+                    String cardText = cardSnapshot.child("cardText").getValue(String.class);
                     String selectedCamera = cardSnapshot.child("selectedCamera").getValue(String.class);
                     String cardP1 = cardSnapshot.child("cardP1").getValue(String.class);
                     String cardP2 = cardSnapshot.child("cardP2").getValue(String.class);

@@ -46,23 +46,6 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
         CardItem cardItem = cardItemList.get(position);
         holder.bind(cardItem);
 
-        // Check if cameraNames is not null and has data
-        if (cameraNames != null && !cameraNames.isEmpty()) {
-            Spinner spinnerCamera = holder.itemView.findViewById(R.id.spinner_camera);
-
-            // Create an ArrayAdapter using the fetched camera names
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                    holder.itemView.getContext(),
-                    android.R.layout.simple_spinner_item,
-                    cameraNames
-            );
-
-            // Specify the layout to use when the list of choices appears
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-            // Apply the adapter to the Spinner
-            spinnerCamera.setAdapter(adapter);
-        }
 
         // Get the current card ID
         String currentCardId = cardItem.getCardId();
@@ -71,7 +54,21 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
         Button button1 = holder.itemView.findViewById(R.id.btn_chg_parking1);
         Button button2 = holder.itemView.findViewById(R.id.btn_chg_parking2);
         Button button3 = holder.itemView.findViewById(R.id.btn_chg_parking3);
+        ImageView editTitleImageView = holder.itemView.findViewById(R.id.edit_IV_Title); // Replace with your ImageView ID
+        ImageView editCameraImageView = holder.itemView.findViewById(R.id.edit_IV_Camera);
+        editTitleImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                testFragment.updateCardTitle(currentCardId);
+            }
+        });
+        editCameraImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                testFragment.showCameraListDialog(currentCardId);
 
+            }
+        });
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -111,20 +108,22 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
     }
 
     public class CardViewHolder extends RecyclerView.ViewHolder {
-        private EditText mEditText;
+        private TextView txt_title,txt_camera;
         private ImageView img1,img2,img3;
 
         public CardViewHolder(View itemView) {
             super(itemView);
-            mEditText = itemView.findViewById(R.id.editPillarName);
+
             img1 = itemView.findViewById(R.id.IV_Parking1);
             img2 = itemView.findViewById(R.id.IV_Parking2);
             img3 = itemView.findViewById(R.id.IV_Parking3);
-
+            txt_title = itemView.findViewById(R.id.txt_card);
+            txt_camera = itemView.findViewById(R.id.txt_camera);
         }
 
         public void bind(CardItem cardItem) {
-            mEditText.setText(cardItem.getCardText());
+            txt_title.setText(cardItem.getCardText());
+            txt_camera.setText(cardItem.getSelectedCamera());
             setImageResourceBasedOnCardP(img1, cardItem.getCardP1());
             setImageResourceBasedOnCardP(img2, cardItem.getCardP2());
             setImageResourceBasedOnCardP(img3, cardItem.getCardP3());

@@ -55,7 +55,7 @@ public class AdminHomepage extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         adminId = getIntent().getStringExtra("adminId");
-        Log.d("CheckID", adminId);
+
         mAuth = FirebaseAuth.getInstance();
         radioGroupContainer = findViewById(R.id.radioGroupContainer);
         addlocationBtn = findViewById(R.id.add_btn);
@@ -272,8 +272,9 @@ public class AdminHomepage extends AppCompatActivity {
                 DatabaseReference camerasRef = FirebaseDatabase.getInstance().getReference("camera").child(userInput).child("ownedBy");
 
                 // Set the camera name under the defined path
-                camerasRef.setValue(adminId);
-
+                camerasRef.child("ownedBy").setValue(adminId);
+                camerasRef.child("assignedLocation").setValue("None");
+                camerasRef.child("assignedCard").setValue("None");
                 // Close the dialog
                 dialog.dismiss();
             }

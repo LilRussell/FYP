@@ -2,13 +2,19 @@ package com.example.smartparkingfinder;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.InputType;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,13 +27,14 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class TestFragment extends Fragment {
-    private static final String TAG = "TestFragment";
+
     private RecyclerView recyclerView;
     private CardAdapter adapter;
     private List<CardItem> cardItemList;
@@ -35,6 +42,7 @@ public class TestFragment extends Fragment {
     private TestFragment fragment;
     private String currentCardId; // Store the current card ID
     private String parkingSlot;
+    private String adminId;
     public TestFragment() {
         // Required empty public constructor
     }
@@ -45,8 +53,6 @@ public class TestFragment extends Fragment {
         fragment = this;
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_container, container, false);
-        Log.d(TAG, "onCreateView called for Fragment " + getArguments().getString("tabTitle"));
-
         // Initialize the RecyclerView and cardItemList
         recyclerView = view.findViewById(R.id.RV_parking);
         cardItemList = new ArrayList<>();
@@ -55,41 +61,251 @@ public class TestFragment extends Fragment {
         // Set up the RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(adapter);
+        Bundle args = getArguments();
+        if (args != null) {
+            adminId = args.getString("adminIdKey");
+            // Now, you have assigned the admin ID to the class-level variable
+            Log.d("adminID",adminId);
+        }
 
-        // Fetch camera names from Firebase
-        DatabaseReference camerasRef = FirebaseDatabase.getInstance().getReference("camera").child("ownedBy");
-        camerasRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                List<String> cameraNames = new ArrayList<>();
-                cameraNames.add("Unassigned");
-                for (DataSnapshot cameraSnapshot : dataSnapshot.getChildren()) {
-                    String cameraName = cameraSnapshot.child("name").getValue(String.class);
-                    if (cameraName != null) {
-                        cameraNames.add(cameraName);
-                    }
-                }
-                // Pass the camera names to the adapter when creating an instance of it
-                adapter = new CardAdapter(cardItemList, cameraNames, fragment);
-
-                // Set up the RecyclerView
-                recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                recyclerView.setAdapter(adapter);
-
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Handle error
-            }
-        });
 
 
 
 
         return view;
     }
+    void showCameraListDialog(String cardId) {
+        currentCardId = cardId;
+
+        // Inflate the custom layout for the AlertDialog
+        View customLayout = getLayoutInflater().inflate(R.layout.select_camera, null);
+
+        // Create an AlertDialog builder
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+
+        // Set the custom layout as the view for the AlertDialog
+        builder.setView(customLayout);
+
+        // Find views in the custom layout
+        RadioGroup cameraListRadioGroup = customLayout.findViewById(R.id.camera_list);
+        Button addButton = customLayout.findViewById(R.id.add_button);
+        Button okButton = customLayout.findViewById(R.id.ok_button);
+        Button cancelButton = customLayout.findViewById(R.id.cancel_button);
+
+        // Set the title and other attributes for the AlertDialog
+        builder.setTitle("Add Camera");
+
+        // Create and show the AlertDialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        // Create a DatabaseReference to refer to the "camera" node
+        DatabaseReference camerasRef = FirebaseDatabase.getInstance().getReference().child("camera");
+
+        // Create a query to filter cameras by the "ownedBy" field
+        //Query adminCamerasQuery = camerasRef.child("ownedBy").equalTo(adminId);
+        // Replace adminId with the actual admin's ID
+
+        // Create a list to store camera names associated with the admin
+        List<String> cameraNames = new ArrayList<>();
+
+        camerasRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // Clear the existing radio buttons
+                cameraListRadioGroup.removeAllViews();
+
+                // Loop through the query results
+                for (DataSnapshot cameraSnapshot : dataSnapshot.getChildren()) {
+                    // Assuming "name" is the field that contains the camera name
+                    if(cameraSnapshot.child("ownedBy").getValue(String.class).equals(adminId)){
+                        String cameraName = cameraSnapshot.child("id").getValue(String.class);
+
+                        if (cameraName != null) {
+                            cameraNames.add(cameraName);
+                            RadioButton radioButton = new RadioButton(requireContext());
+                            radioButton.setText(cameraName);
+                            cameraListRadioGroup.addView(radioButton);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle errors here
+            }
+        });
+
+        // Handle button clicks
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Handle the "ADD" button click
+                // You can add radio buttons to the RadioGroup dynamically here
+                // For example, assume camerasDataList is a list of camera names fetched from your database
+                for (String cameraName : cameraNames) {
+                    RadioButton radioButton = new RadioButton(requireContext());
+                    radioButton.setText(cameraName); // Set the text for the radio button
+                    cameraListRadioGroup.addView(radioButton);
+                }
+            }
+        });
+
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String selectedCameraName = null;
+                // Iterate through the radio buttons to find the selected one
+                for (int i = 0; i < cameraListRadioGroup.getChildCount(); i++) {
+                    RadioButton radioButton = (RadioButton) cameraListRadioGroup.getChildAt(i);
+                    if (radioButton.isChecked()) {
+                        selectedCameraName = radioButton.getText().toString();
+                        break; // Exit the loop once the selected radio button is found
+                    }
+                }
+                // Now, you have the selected camera name in the 'selectedCameraName' variable
+                if (selectedCameraName != null) {
+                    // Do something with the selected camera name
+                    // For example, you can print it or use it as needed
+                    updateSelectedCameraInFirebase(selectedCameraName);
+                    Log.d("SelectedCamera", "Selected camera: " + selectedCameraName);
+                }
+
+
+
+                dialog.dismiss();
+            }
+        });
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Handle the "CANCEL" button click
+                // You can dismiss the dialog without saving anything
+                dialog.dismiss();
+            }
+        });
+    }
+    private void updateSelectedCameraInFirebase(String newTitle) {
+
+
+        Bundle args = getArguments(); // Retrieve fragment's arguments
+        if (args != null) {
+            String locationId = args.getString("locationId");
+            String tabTitle = args.getString("tabTitle");
+
+            if (locationId != null && tabTitle != null) {
+                DatabaseReference cardRef = FirebaseDatabase.getInstance().getReference()
+                        .child("location")
+                        .child(locationId)
+                        .child("details")
+                        .child("layout")
+                        .child(tabTitle)
+                        .child("card")
+                        .child(currentCardId)
+                        .child("selectedCamera");
+                cardRef.setValue(newTitle);
+
+                DatabaseReference camRefLoc = FirebaseDatabase.getInstance().getReference()
+                        .child("camera")
+                        .child(newTitle)
+                        .child("assignedLocation");
+                DatabaseReference camRefCard = FirebaseDatabase.getInstance().getReference()
+                        .child("camera")
+                        .child(newTitle)
+                        .child("assignedCard");
+
+
+                camRefLoc.setValue(locationId);
+                camRefCard.setValue(currentCardId);
+
+                for (CardItem cardItem : cardItemList) {
+                    if (cardItem.getCardId().equals(currentCardId)) {
+                        cardItem.setSelectedCamera(newTitle);
+                        break; // Break the loop once the selected card is found
+                    }
+                }adapter.notifyDataSetChanged();
+
+
+            }
+        }
+    }
+
+
+
+
+    void updateCardTitle(String cardId) {
+        currentCardId = cardId;
+
+        // Create an AlertDialog builder
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+
+        // Set up the input view
+        final EditText input = new EditText(requireContext());
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+
+        builder.setTitle("Edit Card Title")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String newTitle = input.getText().toString().trim();
+                        if (!TextUtils.isEmpty(newTitle)) {
+                            // Handle the new title (e.g., save it or perform an action)
+                            updateCardTitleInFirebase(newTitle);
+
+                        } else {
+                            // Handle the case where the input is empty
+                            Toast.makeText(requireContext(), "Title cannot be empty", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+        // Create and show the dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void updateCardTitleInFirebase(String newTitle) {
+
+
+        Bundle args = getArguments(); // Retrieve fragment's arguments
+        if (args != null) {
+            String locationId = args.getString("locationId");
+            String tabTitle = args.getString("tabTitle");
+
+            if (locationId != null && tabTitle != null) {
+                DatabaseReference cardRef = FirebaseDatabase.getInstance().getReference()
+                        .child("location")
+                        .child(locationId)
+                        .child("details")
+                        .child("layout")
+                        .child(tabTitle)
+                        .child("card")
+                        .child(currentCardId)
+                        .child("cardText");
+                cardRef.setValue(newTitle);
+
+                for (CardItem cardItem : cardItemList) {
+                    if (cardItem.getCardId().equals(currentCardId)) {
+                        cardItem.setCardText(newTitle);
+                        break; // Break the loop once the selected card is found
+                    }
+                }adapter.notifyDataSetChanged();
+
+
+            }
+        }
+    }
+
 
     void showRadioButtonDialog(String cardId,String Slot) {
         // Store the current card ID
