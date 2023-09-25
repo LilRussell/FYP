@@ -35,4 +35,5 @@
     <string name="family_parking">Family Parking</string>
     <string name="ladies_parking">Ladies Parking</string>
     <string name="not_available">Not Available</string>
+    <string name="no_available_cameras">No Available Cameras.</string>
 </resources>

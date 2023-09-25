@@ -6,6 +6,7 @@
 
 
     <!-- Radio Button List -->
+
     <RadioGroup
         android:id="@+id/camera_list"
         android:layout_width="match_parent"
@@ -16,6 +17,15 @@
         <!-- Radio Buttons for Camera List (Populated Dynamically) -->
 
     </RadioGroup>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/txt_no_camera"
+        android:text="@string/no_available_cameras"
+        android:gravity="center"
+        android:textStyle="bold"
+
+        />
 
     <!-- Buttons -->
     <LinearLayout

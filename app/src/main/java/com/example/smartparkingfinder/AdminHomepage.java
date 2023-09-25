@@ -48,6 +48,7 @@ public class AdminHomepage extends AppCompatActivity {
     private String adminId;
     private FirebaseAuth mAuth;
     private FrameLayout radioGroupContainer;
+    private boolean isBottomSheetDialogShown = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -150,7 +151,9 @@ public class AdminHomepage extends AppCompatActivity {
     }
 
     private void showBottomSheetDialog(locationRVModel item) {
-
+        if (isBottomSheetDialogShown) {
+            return;
+        }
         // Create and show the BottomSheetDialog here
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
         View view = getLayoutInflater().inflate(R.layout.bottom_sheet_dialog, null);
@@ -227,14 +230,19 @@ public class AdminHomepage extends AppCompatActivity {
                         });
             }
         });
+        // Set click listener for closing the BottomSheetDialog
+        bottomSheetDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                // Update the flag when the BottomSheetDialog is dismissed
+                isBottomSheetDialogShown = false;
+            }
+        });
+
+        // Show the BottomSheetDialog
         bottomSheetDialog.setContentView(view);
-        // Check again if the activity is still alive before showing the dialog
-        if (!isFinishing()) {
-            bottomSheetDialog.show();
-        }
-        if (isFinishing()) {
-            bottomSheetDialog.dismiss();
-        }
+        bottomSheetDialog.show();
+        isBottomSheetDialogShown = true; // Update the flag
 
     }
     // To logout the user
@@ -269,7 +277,7 @@ public class AdminHomepage extends AppCompatActivity {
                 String userInput = inputEditText.getText().toString();
 
                 // Define the path where you want to store the camera name
-                DatabaseReference camerasRef = FirebaseDatabase.getInstance().getReference("camera").child(userInput).child("ownedBy");
+                DatabaseReference camerasRef = FirebaseDatabase.getInstance().getReference("camera").child(userInput);
 
                 // Set the camera name under the defined path
                 camerasRef.child("ownedBy").setValue(adminId);

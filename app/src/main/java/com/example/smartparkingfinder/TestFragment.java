@@ -65,7 +65,7 @@ public class TestFragment extends Fragment {
         if (args != null) {
             adminId = args.getString("adminIdKey");
             // Now, you have assigned the admin ID to the class-level variable
-            Log.d("adminID",adminId);
+          //  Log.d("adminID",adminId);
         }
 
 
@@ -91,7 +91,7 @@ public class TestFragment extends Fragment {
         Button addButton = customLayout.findViewById(R.id.add_button);
         Button okButton = customLayout.findViewById(R.id.ok_button);
         Button cancelButton = customLayout.findViewById(R.id.cancel_button);
-
+        TextView noCamerasTextView = customLayout.findViewById(R.id.txt_no_camera);
         // Set the title and other attributes for the AlertDialog
         builder.setTitle("Add Camera");
 
@@ -114,11 +114,13 @@ public class TestFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 // Clear the existing radio buttons
                 cameraListRadioGroup.removeAllViews();
-
+                noCamerasTextView.setVisibility(View.GONE);
+                // Clear the camera names list
+                cameraNames.clear();
                 // Loop through the query results
                 for (DataSnapshot cameraSnapshot : dataSnapshot.getChildren()) {
                     // Assuming "name" is the field that contains the camera name
-                    if(cameraSnapshot.child("ownedBy").getValue(String.class).equals(adminId)){
+                    if(cameraSnapshot.child("ownedBy").getValue(String.class).equals(adminId)&&cameraSnapshot.child("assignedLocation").getValue(String.class).equals("None")){
                         String cameraName = cameraSnapshot.child("id").getValue(String.class);
 
                         if (cameraName != null) {
@@ -128,6 +130,11 @@ public class TestFragment extends Fragment {
                             cameraListRadioGroup.addView(radioButton);
                         }
                     }
+                }
+                if (cameraNames.isEmpty()) {
+                    noCamerasTextView.setVisibility(View.VISIBLE);
+                } else {
+                    noCamerasTextView.setVisibility(View.GONE);
                 }
             }
 
@@ -167,13 +174,9 @@ public class TestFragment extends Fragment {
                 }
                 // Now, you have the selected camera name in the 'selectedCameraName' variable
                 if (selectedCameraName != null) {
-                    // Do something with the selected camera name
-                    // For example, you can print it or use it as needed
                     updateSelectedCameraInFirebase(selectedCameraName);
                     Log.d("SelectedCamera", "Selected camera: " + selectedCameraName);
                 }
-
-
 
                 dialog.dismiss();
             }

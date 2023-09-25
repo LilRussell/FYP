@@ -110,6 +110,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
     public class CardViewHolder extends RecyclerView.ViewHolder {
         private TextView txt_title,txt_camera;
         private ImageView img1,img2,img3;
+        private Button btn1,btn2,btn3;
 
         public CardViewHolder(View itemView) {
             super(itemView);
@@ -119,17 +120,35 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
             img3 = itemView.findViewById(R.id.IV_Parking3);
             txt_title = itemView.findViewById(R.id.txt_card);
             txt_camera = itemView.findViewById(R.id.txt_camera);
+            btn1=itemView.findViewById(R.id.btn_chg_parking1);
+            btn2=itemView.findViewById(R.id.btn_chg_parking2);
+            btn3=itemView.findViewById(R.id.btn_chg_parking3);
         }
 
         public void bind(CardItem cardItem) {
             txt_title.setText(cardItem.getCardText());
             txt_camera.setText(cardItem.getSelectedCamera());
+
             setImageResourceBasedOnCardP(img1, cardItem.getCardP1());
             setImageResourceBasedOnCardP(img2, cardItem.getCardP2());
             setImageResourceBasedOnCardP(img3, cardItem.getCardP3());
+            if(txt_camera!=null){
+                DisableButton(btn1,txt_camera,cardItem.getSelectedCamera());
+                DisableButton(btn2,txt_camera,cardItem.getSelectedCamera());
+                DisableButton(btn3,txt_camera,cardItem.getSelectedCamera());
+            }
+
         }
     }
-
+    private void DisableButton(Button button,TextView textView,String camera){
+        if (camera == null || camera.isEmpty()) {
+            button.setEnabled(false);
+        } else {
+            if (textView != null) {
+                textView.setText(camera);
+            }
+        }
+    }
 
 
 
