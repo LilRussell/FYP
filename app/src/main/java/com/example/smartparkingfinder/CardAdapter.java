@@ -138,6 +138,12 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
                 DisableButton(btn3,txt_camera,cardItem.getSelectedCamera());
             }
 
+            setImageResourceBasedOnStatusAndCardP(img1,cardItem.getStatusP1(), cardItem.getCardP1());
+            setImageResourceBasedOnStatusAndCardP(img2, cardItem.getStatusP2(), cardItem.getCardP2());
+            setImageResourceBasedOnStatusAndCardP(img3, cardItem.getStatusP3(), cardItem.getCardP3());
+
+
+
         }
     }
     private void DisableButton(Button button,TextView textView,String camera){
@@ -149,8 +155,6 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
             }
         }
     }
-
-
 
     private void setImageResourceBasedOnCardP(ImageView imageView, String cardP) {
         int imageResource;
@@ -172,4 +176,45 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
 
         imageView.setImageResource(imageResource);
     }
+    private void setImageResourceBasedOnStatusAndCardP(ImageView imageView, String status, String cardP) {
+        int imageResource;
+
+        // Check the status first
+        if ("Occupied".equals(status)) {
+            // Check cardP when status is "Occupied"
+            switch (cardP) {
+                case "Normal Parking":
+                    imageResource = R.drawable.image_red; // Change to img_red for Normal Parking
+                    break;
+                case "Disabled Parking":
+                    imageResource = R.drawable.image_oku_red; // Change to img_oku_red for Disabled Parking
+                    break;
+                case "Reserved Parking":
+                    imageResource = R.drawable.image_rsv; // Change to img_rsv_red for Reserved Parking
+                    break;
+                default:
+                    imageResource = R.drawable.image_na; // Change to the appropriate default image
+                    break;
+            }
+        } else {
+            // Handle the case when status is not "Occupied"
+            switch (cardP) {
+                case "Normal Parking":
+                    imageResource = R.drawable.image_grn;
+                    break;
+                case "Disabled Parking":
+                    imageResource = R.drawable.image_oku_grn;
+                    break;
+                case "Reserved Parking":
+                    imageResource = R.drawable.image_rsv;
+                    break;
+                default:
+                    imageResource = R.drawable.image_na;
+                    break;
+            }
+        }
+
+        imageView.setImageResource(imageResource);
+    }
+
 }

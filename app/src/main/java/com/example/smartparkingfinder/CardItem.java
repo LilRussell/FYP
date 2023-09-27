@@ -4,10 +4,12 @@ public class CardItem {
     private String cardId;
     private String cardText;
     private String selectedCamera;
-    private String cardP1; // New field
-    private String cardP2; // New field
-    private String cardP3; // New field
-    private String spaceP1;
+    private String cardP1;
+    private String cardP2;
+    private String cardP3;
+    private String statusP1;
+    private String statusP2;
+    private String statusP3;
     public CardItem(String cardId, String cardText) {
         this.cardId = cardId;
         this.cardText = cardText;
@@ -63,8 +65,24 @@ public class CardItem {
     public void setCardP3(String cardP3) {
         this.cardP3 = cardP3;
     }
-    public String getSpaceP1() {
-        return spaceP1;
+    public String getStatusP1() {
+        return statusP1;
+    }
+
+    public String getStatusP2() {
+        return statusP2;
+    }
+    public String getStatusP3() {
+        return statusP3;
+    }
+    public void setStatusP1(String statusP1){
+        this.statusP1=statusP1;
+    }
+    public void setStatusP2(String statusP2){
+        this.statusP2=statusP2;
+    }
+    public void setStatusP3(String statusP3){
+        this.statusP3=statusP3;
     }
 
 

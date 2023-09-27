@@ -2,6 +2,7 @@ package com.example.smartparkingfinder;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
@@ -43,6 +44,8 @@ public class TestFragment extends Fragment {
     private String currentCardId; // Store the current card ID
     private String parkingSlot;
     private String adminId;
+    private DatabaseReference cameraRef;
+    private ValueEventListener cameraListener;
     public TestFragment() {
         // Required empty public constructor
     }
@@ -64,16 +67,122 @@ public class TestFragment extends Fragment {
         Bundle args = getArguments();
         if (args != null) {
             adminId = args.getString("adminIdKey");
-            // Now, you have assigned the admin ID to the class-level variable
-          //  Log.d("adminID",adminId);
         }
 
+        for (CardItem cardItem : cardItemList) {
+            Log.d("CardItemID", "Card ID: " + cardItem.getCardId());
+        }
+        // Firebase reference to the "camera" node
+        cameraRef = FirebaseDatabase.getInstance().getReference().child("camera");
 
+// Add a ValueEventListener to monitor changes in the "camera" node
+        cameraListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // Loop through the card items to update "statusP1," "statusP2," and "statusP3" based on "camera" node data
+                for (CardItem cardItem : cardItemList) {
+                    String selectedCamera = cardItem.getSelectedCamera();
+                    String cardId = cardItem.getCardId();
 
+                    // Check if the selectedCamera is not null
+                    if (selectedCamera != null) {
+                        DataSnapshot cameraSnapshot = dataSnapshot.child(selectedCamera);
 
+                        if (cameraSnapshot.exists()) {
+                            // Get the values of "statusA," "statusB," and "statusC" from the camera node
+                            String statusA = cameraSnapshot.child("statusA").getValue(String.class);
+                            String statusB = cameraSnapshot.child("statusB").getValue(String.class);
+                            String statusC = cameraSnapshot.child("statusC").getValue(String.class);
 
+                            // Check for null values before using them in the switch statement
+                            if (statusA != null) {
+                                switch (statusA) {
+                                    case "Occupied":
+                                        updateStatusInFirebase(cardId, "statusP1", "Occupied");
+                                        cardItem.setStatusP1("Occupied");
+                                        break;
+                                    case "Empty":
+                                        updateStatusInFirebase(cardId, "statusP1", "Empty");
+                                        cardItem.setStatusP1("Empty");
+                                        break;
+                                    // Add more cases if needed
+                                }
+                            }
+
+                            if (statusB != null) {
+                                switch (statusB) {
+                                    case "Occupied":
+                                        updateStatusInFirebase(cardId, "statusP2", "Occupied");
+                                        cardItem.setStatusP2("Occupied");
+                                        break;
+                                    case "Empty":
+                                        updateStatusInFirebase(cardId, "statusP2", "Empty");
+                                        cardItem.setStatusP2("Empty");
+                                        break;
+                                    // Add more cases if needed
+                                }
+                            }
+
+                            if (statusC != null) {
+                                switch (statusC) {
+                                    case "Occupied":
+                                        updateStatusInFirebase(cardId, "statusP3", "Occupied");
+                                        cardItem.setStatusP3("Occupied");
+                                        break;
+                                    case "Empty":
+                                        updateStatusInFirebase(cardId, "statusP3", "Empty");
+                                        cardItem.setStatusP3("Empty");
+                                        break;
+                                    // Add more cases if needed
+                                }
+                            }
+                        }
+                    }
+                }
+                // Notify the adapter that the data has changed
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle errors here
+            }
+        };
+
+// Add the ValueEventListener to the cameraRef
+        cameraRef.addValueEventListener(cameraListener);
         return view;
     }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        // Remove the ValueEventListener when the fragment is destroyed
+        if (cameraRef != null && cameraListener != null) {
+            cameraRef.removeEventListener(cameraListener);
+        }
+    }
+    private void updateStatusInFirebase(String cardId, String statusFromCard, String statusFromCamera){
+        Bundle args = getArguments(); // Retrieve fragment's arguments
+        if (args != null) {
+            String locationId = args.getString("locationId");
+            String tabTitle = args.getString("tabTitle");
+
+            if (locationId != null && tabTitle != null) {
+                DatabaseReference cardRef = FirebaseDatabase.getInstance().getReference()
+                        .child("location")
+                        .child(locationId)
+                        .child("details")
+                        .child("layout")
+                        .child(tabTitle)
+                        .child("card")
+                        .child(cardId)
+                        .child(statusFromCard);
+                cardRef.setValue(statusFromCamera);
+            }
+        }
+    }
+
     void showCameraListDialog(String cardId) {
         currentCardId = cardId;
 
@@ -101,10 +210,6 @@ public class TestFragment extends Fragment {
 
         // Create a DatabaseReference to refer to the "camera" node
         DatabaseReference camerasRef = FirebaseDatabase.getInstance().getReference().child("camera");
-
-        // Create a query to filter cameras by the "ownedBy" field
-        //Query adminCamerasQuery = camerasRef.child("ownedBy").equalTo(adminId);
-        // Replace adminId with the actual admin's ID
 
         // Create a list to store camera names associated with the admin
         List<String> cameraNames = new ArrayList<>();
@@ -209,7 +314,7 @@ public class TestFragment extends Fragment {
                         .child("card")
                         .child(currentCardId)
                         .child("selectedCamera");
-                cardRef.setValue(newTitle);
+                        cardRef.setValue(newTitle);
 
                 DatabaseReference camRefLoc = FirebaseDatabase.getInstance().getReference()
                         .child("camera")
@@ -408,5 +513,12 @@ public class TestFragment extends Fragment {
 
         // Notify the adapter of the data change
         adapter.notifyDataSetChanged();
+
+        // Print the card IDs and the count of items in the list
+        for (CardItem item : cardItemList) {
+            Log.d("CardItemID", "Card ID: " + item.getCardId());
+        }
+
+        Log.d("CardItemCount", "Number of items in cardItemList: " + cardItemList.size());
     }
 }

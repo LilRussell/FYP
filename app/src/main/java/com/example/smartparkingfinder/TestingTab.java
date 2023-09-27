@@ -127,6 +127,9 @@ public class TestingTab extends AppCompatActivity {
                     newCard.setCardP1("");
                     newCard.setCardP2("");
                     newCard.setCardP3("");
+                    newCard.setStatusP1("");
+                    newCard.setStatusP2("");
+                    newCard.setStatusP3("");
 
                     // Increment the card counter for the next card
                     cardCounter++;
@@ -256,15 +259,18 @@ public class TestingTab extends AppCompatActivity {
                     String cardP1 = cardSnapshot.child("cardP1").getValue(String.class);
                     String cardP2 = cardSnapshot.child("cardP2").getValue(String.class);
                     String cardP3 = cardSnapshot.child("cardP3").getValue(String.class);
-
+                    String statusP1 =cardSnapshot.child("statusP1").getValue(String.class);
+                    String statusP2 =cardSnapshot.child("statusP2").getValue(String.class);
+                    String statusP3 =cardSnapshot.child("statusP3").getValue(String.class);
                     // Create a CardItem object with the retrieved data
                     CardItem cardItem = new CardItem(cardId, cardText);
                     cardItem.setSelectedCamera(selectedCamera);
                     cardItem.setCardP1(cardP1);
                     cardItem.setCardP2(cardP2);
                     cardItem.setCardP3(cardP3);
-
-                    // Here, you have the cardItem, you can add it to the corresponding fragment
+                    cardItem.setStatusP1(statusP1);
+                    cardItem.setStatusP2(statusP2);
+                    cardItem.setStatusP3(statusP3);
                     updateFragmentUI(tabTitle, cardItem);
                 }
             }
