@@ -36,4 +36,7 @@
     <string name="ladies_parking">Ladies Parking</string>
     <string name="not_available">Not Available</string>
     <string name="no_available_cameras">No Available Cameras.</string>
+    <string name="all_parking_location">All Parking Location</string>
+    <string name="recent_visited_places">Recent Visited Places</string>
+    <string name="search">Search</string>
 </resources>

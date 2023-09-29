@@ -7,7 +7,9 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="custom_blue">#03a1fc</color>
+    <color name="custom_blue">#1c4081</color>
     <color name="custom_grey">#4f5354</color>
+    <color name="status_bar_color">#1c4081</color>
+    <color name="cardColor">#fff5df</color>
 
 </resources>

@@ -5,8 +5,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_gravity="center"
     android:layout_margin="5dp"
-    app:cardCornerRadius="4dp"
-    app:cardElevation="3dp">
+    app:cardCornerRadius="20dp"
+
+    app:cardBackgroundColor="@color/cardColor"
+    app:cardElevation="80dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -14,29 +16,47 @@
 
         <ImageView
             android:id="@+id/idImgLocation"
-            android:layout_width="154dp"
-            android:layout_height="165dp"
+            android:layout_width="133dp"
+            android:layout_height="135dp"
             android:scaleType="centerCrop" />
 
         <TextView
             android:id="@+id/idLocationDesc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="233dp"
+            android:layout_height="152dp"
             android:layout_above="@+id/idLocation"
-            android:layout_marginStart="0dp"
-            android:layout_marginBottom="149dp"
+            android:layout_alignParentTop="true"
+            android:shadowColor="#808080"
+            android:shadowDx="2"
+            android:shadowDy="4"
+            android:shadowRadius="3"
+            android:padding="4dp"
+            android:fontFamily="sans-serif-medium"
+            android:layout_marginStart="1dp"
+            android:layout_marginLeft="1dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="1dp"
+            android:textColor="@color/black"
+            android:textSize="18sp"
             android:layout_toEndOf="@+id/idImgLocation"
             android:layout_toRightOf="@id/idImgLocation" />
+
         <TextView
             android:id="@+id/idLocation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/idImgLocation"
-            android:layout_marginStart="3dp"
+            android:layout_marginStart="10dp"
             android:layout_marginTop="3dp"
-            android:layout_marginEnd="3dp"
+            android:layout_marginEnd="15dp"
             android:layout_marginBottom="3dp"
+
+            android:shadowColor="#808080"
+            android:shadowDx="2"
+            android:shadowDy="4"
+            android:shadowRadius="3"
             android:padding="4dp"
+            android:fontFamily="sans-serif-medium"
             android:singleLine="true"
             android:text="@string/location"
             android:textColor="@color/black"
@@ -48,9 +68,15 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/idLocation"
             android:layout_alignParentStart="true"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="6dp"
-            android:layout_marginBottom="3dp"
+            android:layout_marginStart="10dp"
+
+            android:layout_marginEnd="15dp"
+            android:layout_marginBottom="13dp"
+            android:fontFamily="sans-serif-medium"
+            android:shadowColor="#808080"
+            android:shadowDx="2"
+            android:shadowDy="4"
+            android:shadowRadius="3"
             android:padding="4dp"
             android:singleLine="true"
             android:text="@string/parking_available"

@@ -1,27 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
+
     <include layout="@layout/toolbar"/>
+
+
+
     <TextView
-        android:id="@+id/txt_Parking"
-        android:layout_width="187dp"
-        android:layout_height="171dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginStart="116dp"
-        android:layout_marginEnd="108dp"
-        android:layout_marginBottom="312dp"
-        android:text="Hello World!"
-        android:textSize="34sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
+        android:id="@+id/recentitemtxt"
+        android:text="@string/recent_visited_places"
+        android:textSize="20sp"
+        android:fontFamily="sans-serif-medium"
+        android:layout_marginLeft="20dp"
+        android:shadowColor="#808080"
+        android:shadowDx="8"
+        android:shadowDy="4"
+        android:shadowRadius="3"
+        android:textColor="@color/cardColor"
+        />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/horizontalRecyclerView_Main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/recentitemtxt"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        android:orientation="horizontal"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+    <TextView
+        android:id="@+id/allitemtxt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/horizontalRecyclerView_Main"
+        android:layout_marginLeft="20dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/all_parking_location"
+        android:shadowColor="#808080"
+        android:shadowDx="8"
+        android:shadowDy="4"
+        android:shadowRadius="3"
+        android:textColor="@color/cardColor"
+        android:textSize="20sp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/verticalRecyclerView_Main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/allitemtxt"
+        android:layout_above="@+id/bottomNavMain"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="20dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:id="@+id/bottomNavMain"
+        android:background="@color/custom_blue"
+        android:layout_alignParentBottom="true"/>
 
 </RelativeLayout>
