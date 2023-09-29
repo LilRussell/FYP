@@ -6,6 +6,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -48,7 +49,14 @@ public class MainActivity extends AppCompatActivity {
         adapter.setOnItemClickListener(new UserAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(locationRVModel item) {
-
+                // Handle Edit Parking Layout button click here
+                String selectedLocationId = item.getId();
+                String selectedLocationTitle = item.getName();
+                // You can launch an edit parking layout activity or perform any other action
+                Intent intent = new Intent(MainActivity.this, User_Parking_Location.class);
+                intent.putExtra("locationId", selectedLocationId);
+                intent.putExtra("locationName",selectedLocationTitle);
+                startActivity(intent);
             }
         });
         // Retrieve data from Firebase
