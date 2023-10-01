@@ -1,5 +1,6 @@
 package com.example.smartparkingfinder;
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,22 +13,28 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import org.w3c.dom.Text;
+
 import java.util.List;
 public class UserCardAdapter extends RecyclerView.Adapter<UserCardAdapter.CardViewHolder> {
 
     private List<UserCardItem> cardItemList;
     private Context context;
     private UserFragment mUserFragment;
+    private RecyclerView recyclerView;
 
-    public UserCardAdapter(List<UserCardItem> cardItemList, UserFragment mUserFragment) {
+    public UserCardAdapter(List<UserCardItem> cardItemList, UserFragment mUserFragment,RecyclerView recyclerView) {
         this.cardItemList = cardItemList;
         this.mUserFragment = mUserFragment;
+        this.recyclerView = recyclerView;
     }
 
     @NonNull
@@ -43,11 +50,14 @@ public class UserCardAdapter extends RecyclerView.Adapter<UserCardAdapter.CardVi
     public void onBindViewHolder(@NonNull CardViewHolder holder, int position) {
         UserCardItem userCardItem = cardItemList.get(position);
         holder.bind(userCardItem);
-        // Get the current card ID
-        String currentCardId = userCardItem.getCardId();
-
 
     }
+    public void scrollToPosition(int position) {
+        if (position >= 0 && position < cardItemList.size()) {
+            recyclerView.smoothScrollToPosition(position);
+        }
+    }
+
 
     @Override
     public int getItemCount() {
@@ -55,7 +65,7 @@ public class UserCardAdapter extends RecyclerView.Adapter<UserCardAdapter.CardVi
     }
 
     public class CardViewHolder extends RecyclerView.ViewHolder {
-        private TextView txt_title;
+        private TextView txt_title,txt_traffic;
         private ImageView img1,img2,img3;
 
         public CardViewHolder(View itemView) {
@@ -65,7 +75,7 @@ public class UserCardAdapter extends RecyclerView.Adapter<UserCardAdapter.CardVi
             img2 = itemView.findViewById(R.id.IV_Parking2);
             img3 = itemView.findViewById(R.id.IV_Parking3);
             txt_title = itemView.findViewById(R.id.txt_card);
-
+            txt_traffic = itemView.findViewById(R.id.txt_status);
         }
 
         public void bind(UserCardItem userCardItem) {
@@ -80,8 +90,20 @@ public class UserCardAdapter extends RecyclerView.Adapter<UserCardAdapter.CardVi
             setImageResourceBasedOnStatusAndCardP(img2, userCardItem.getStatusP2(), userCardItem.getCardP2());
             setImageResourceBasedOnStatusAndCardP(img3, userCardItem.getStatusP3(), userCardItem.getCardP3());
 
+            cardTraffic(txt_traffic, userCardItem.getStatusP1(), userCardItem.getStatusP2(), userCardItem.getStatusP3());
 
 
+        }
+    }
+    private void cardTraffic(TextView textView,String p1, String p2, String p3){
+        String traffic;
+        if(p1.equals("Occupied")&&p2.equals("Occupied")&&p3.equals("Occupied")){
+            traffic="FULL";
+            textView.setText(traffic);
+        }
+        else{
+            traffic="";
+            textView.setText(traffic);
         }
     }
 

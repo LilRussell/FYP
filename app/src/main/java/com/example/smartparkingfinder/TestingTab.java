@@ -32,7 +32,7 @@ public class TestingTab extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private TestTabAdapter adapter;
-    private Button addTabButton,addCardButton;
+    private Button addTabButton,addCardButton,deleteTabButton;
     private String locationId;
     private String adminId;
     private Toolbar toolbar;
@@ -57,8 +57,9 @@ public class TestingTab extends AppCompatActivity {
 
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
-        addTabButton = findViewById(R.id.addTab_test);
-        addCardButton = findViewById(R.id.addCard_test);
+        addTabButton = findViewById(R.id.addTabButton);
+        addCardButton = findViewById(R.id.addParkingBox);
+        deleteTabButton = findViewById(R.id.deleteTabButton);
         // Load tab data and cards for each tab from Firebase
         loadTabsAndCardsFromFirebase(locationRef);
         addTabButton.setOnClickListener(new View.OnClickListener() {
@@ -84,7 +85,7 @@ public class TestingTab extends AppCompatActivity {
                         if (!TextUtils.isEmpty(tabTitle)) {
                             // Add a new tab and fragment with the entered tab title
                             addNewTab(tabCount,tabTitle);
-                            saveTabToFirebase(locationRef, tabTitle);
+
                             Log.d("Database", "Saved Tab");
 
 
@@ -118,32 +119,105 @@ public class TestingTab extends AppCompatActivity {
                 if (currentFragment instanceof TestFragment) {
                     // Get the TabInfo object for the currently selected tab
                     TabInfo selectedTabInfo = tabInfoList.get(currentItem);
-
-                    // Create a new CardItem with default or empty values
-                    CardItem newCard = new CardItem(null, "Card " + cardCounter);
-
-                    // Set all properties to default or empty values
-                    newCard.setSelectedCamera("");
-                    newCard.setCardP1("");
-                    newCard.setCardP2("");
-                    newCard.setCardP3("");
-                    newCard.setStatusP1("");
-                    newCard.setStatusP2("");
-                    newCard.setStatusP3("");
-
-                    // Increment the card counter for the next card
                     cardCounter++;
-
-                    // Add the new card to the RecyclerView and the list
-                    ((TestFragment) currentFragment).addCardToRecyclerView(newCard);
-
                     // Save the new card to Firebase using the tab ID from TabInfo
-                    saveCardToFirebase(locationRef, selectedTabInfo.getId(), newCard);
+                    saveCardToFirebase(locationRef, selectedTabInfo.getId(),cardCounter,currentFragment);
                     Log.d("Database", "Saved Card");
                 }
             }
         });
+        deleteTabButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int currentItem = viewPager.getCurrentItem();
+                if (currentItem >= 0 && currentItem < tabInfoList.size()) {
+                    String currentTabId = tabInfoList.get(currentItem).getId();
+                    if (currentTabId != null) {
+                        // Create a confirmation dialog
+                        AlertDialog.Builder builder = new AlertDialog.Builder(TestingTab.this);
+                        builder.setTitle("Confirm Deletion");
+                        builder.setMessage("Are you sure you want to delete this tab?");
+
+                        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                updateCamerasForDeletedTab(currentTabId);
+                                // User clicked Yes, delete the tab from Firebase and remove it from the list
+                                deleteTabFromFirebase(locationRef, currentTabId);
+                                removeTabFromList(currentItem);
+                                // Notify the adapter of the data set change
+
+                                adapter.notifyDataSetChanged();
+                            }
+                        });
+
+                        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // User clicked No, do nothing
+                            }
+                        });
+                        // Show the confirmation dialog
+                        builder.create().show();
+                    } else {
+                        // Handle the case where currentTabId is null
+                        Toast.makeText(TestingTab.this, "Tab ID is null.", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    // Handle the case where currentItem is out of bounds
+                    Toast.makeText(TestingTab.this, "Invalid tab index.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
+    private void removeTabFromList(int position) {
+        // Remove the tab from the TabLayout
+        TabLayout.Tab tabToRemove = tabLayout.getTabAt(position);
+        if (tabToRemove != null) {
+            tabLayout.removeTab(tabToRemove);
+        }
+
+        // Remove the fragment associated with the deleted tab
+        adapter.removeFragment(position);
+
+        // Notify the adapter that the data set has changed
+        adapter.notifyDataSetChanged();
+    }
+
+
+    private void deleteTabFromFirebase(DatabaseReference locationRef, String tabId) {
+        // Remove the tab node using its unique ID
+        locationRef.child("details").child("layout").child(tabId).removeValue();
+    }
+    private void updateCamerasForDeletedTab(String tabId) {
+        DatabaseReference cameraRef = FirebaseDatabase.getInstance().getReference().child("camera");
+        cameraRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot cameraSnapshot : dataSnapshot.getChildren()) {
+                    String assignedTab = cameraSnapshot.child("assignedTab").getValue(String.class);
+                    if (assignedTab != null && assignedTab.equals(tabId)) {
+                        // Update the camera's assignedCard and assignedLocation to "None"
+                        String cameraId = cameraSnapshot.getKey();
+                        updateCameraInFirebase(cameraId);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Handle error
+            }
+        });
+    }
+
+    private void updateCameraInFirebase(String cameraId) {
+        DatabaseReference cameraRef = FirebaseDatabase.getInstance().getReference().child("camera").child(cameraId);
+        cameraRef.child("assignedCard").setValue("None");
+        cameraRef.child("assignedLocation").setValue("None");
+        cameraRef.child("assignedTab").setValue("None");
+    }
+
     private void addTabFromFirebase(String tabId, String tabTitle) {
         // Create a TabInfo object and add it to the list
         TabInfo tabInfo = new TabInfo(tabId, tabTitle);
@@ -164,19 +238,15 @@ public class TestingTab extends AppCompatActivity {
     }
 
     private void addNewTab(int Count,String title) {
-        // Create a new fragment for the tab content and add it to the adapter
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference locationRef = database.getReference("location").child(locationId);
         TestFragment fragment = new TestFragment();
-        Bundle args = new Bundle();
-        args.putString("locationId", locationId); // Pass the locationId
-        args.putString("tabTitle", title); // Generate a unique tab title
-        String adminIdToCard = adminId; // Replace with the actual admin ID
-        args.putString("adminIdKey", adminIdToCard);
-        fragment.setArguments(args); // Replace "Tab 1" with the actual tab title
         viewPager.setOffscreenPageLimit(Count);
-        fragment.setArguments(args);// Generate a unique tab title
         adapter.addFragment(fragment, title);
+        saveTabToFirebase(locationRef, title);
         // Notify the adapter that the data set has changed
         adapter.notifyDataSetChanged();
+
 
     }
 
@@ -191,8 +261,16 @@ public class TestingTab extends AppCompatActivity {
         tabsRef.child("name").setValue(tabTitle);
         TabInfo tabInfo = new TabInfo(tabid, tabTitle);
         tabInfoList.add(tabInfo);
+
+        TestFragment fragment = new TestFragment();
+        Bundle args = new Bundle();
+        args.putString("locationId", locationId); // Pass the locationId
+        args.putString("tabTitle", tabid); // Generate a unique tab title
+        String adminIdToCard = adminId; // Replace with the actual admin ID
+        args.putString("adminIdKey", adminIdToCard);
+        fragment.setArguments(args);
     }
-    private void saveCardToFirebase(DatabaseReference locationRef, String currentTabId, CardItem cardItem) {
+    private void saveCardToFirebase(DatabaseReference locationRef, String currentTabId, int CardCount,Fragment currentFragment) {
         // Get a reference to the "cards" section under the selected tab
         DatabaseReference cardsRef = locationRef.child("details").child("layout")
                 .child(currentTabId).child("card");
@@ -202,13 +280,30 @@ public class TestingTab extends AppCompatActivity {
 
         // Get the unique ID generated by push()
         String cardId = cardRef.getKey();
-
+        // Create a new CardItem with default or empty values
+        CardItem newCard = new CardItem(cardId, "Card " + CardCount);
         // Set the card data, including the unique ID
-        cardItem.setCardId(cardId);
+        newCard.setCardId(cardId);
+        // Set all properties to default or empty values
+        newCard.setSelectedCamera("");
+        newCard.setCardP1("");
+        newCard.setCardP2("");
+        newCard.setCardP3("");
+        newCard.setStatusP1("");
+        newCard.setStatusP2("");
+        newCard.setStatusP3("");
+
 
         // Save the cardItem to Firebase
-        cardRef.setValue(cardItem);
+        cardRef.setValue(newCard);
 
+        ((TestFragment) currentFragment).addCardToRecyclerView(newCard);
+        Bundle args = new Bundle();
+        args.putString("locationId", locationId); // Pass the locationId
+        args.putString("tabTitle", currentTabId); // Generate a unique tab title
+        String adminIdToCard = adminId; // Replace with the actual admin ID
+        args.putString("adminIdKey", adminIdToCard);
+        currentFragment.setArguments(args);
         Log.d("saveCard", cardsRef.toString());
     }
     private void updateTabCount(int newTabCount) {

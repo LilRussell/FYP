@@ -27,12 +27,12 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class User_Parking_Location extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private UserTabAdapter adapter;
-    private Button addTabButton,addCardButton;
     private String locationId,locationName;
 
     private Toolbar toolbar;
@@ -46,7 +46,7 @@ public class User_Parking_Location extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
 
         locationId = getIntent().getStringExtra("locationId");
-        locationName = getIntent().getStringExtra("locationName");
+        locationName = getIntent().getStringExtra("locationName").toUpperCase(Locale.ROOT);
         Log.d("title",locationName);
         toolbar.setTitle(locationName);
         setSupportActionBar(toolbar);
@@ -59,10 +59,10 @@ public class User_Parking_Location extends AppCompatActivity {
 
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
-        addTabButton = findViewById(R.id.addTab_test);
-        addCardButton = findViewById(R.id.addCard_test);
+
         // Load tab data and cards for each tab from Firebase
         loadTabsAndCardsFromFirebase(locationRef);
+
 
     }
     private void addTabFromFirebase(String tabId, String tabTitle) {
@@ -120,25 +120,31 @@ public class User_Parking_Location extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot cardSnapshot : dataSnapshot.getChildren()) {
-                    String cardId = cardSnapshot.getKey(); // Get the unique card ID
-                    String cardText = cardSnapshot.child("cardText").getValue(String.class);
-                    String cardCamera = cardSnapshot.child("selectedCamera").getValue(String.class);
-                    String cardP1 = cardSnapshot.child("cardP1").getValue(String.class);
-                    String cardP2 = cardSnapshot.child("cardP2").getValue(String.class);
-                    String cardP3 = cardSnapshot.child("cardP3").getValue(String.class);
-                    String statusP1 =cardSnapshot.child("statusP1").getValue(String.class);
-                    String statusP2 =cardSnapshot.child("statusP2").getValue(String.class);
-                    String statusP3 =cardSnapshot.child("statusP3").getValue(String.class);
-                    // Create a CardItem object with the retrieved data
-                    UserCardItem cardItem = new UserCardItem(cardId, cardText);
-                    cardItem.setSelectedCamera(cardCamera);
-                    cardItem.setCardP1(cardP1);
-                    cardItem.setCardP2(cardP2);
-                    cardItem.setCardP3(cardP3);
-                    cardItem.setStatusP1(statusP1);
-                    cardItem.setStatusP2(statusP2);
-                    cardItem.setStatusP3(statusP3);
-                    updateFragmentUI(tabTitle, cardItem);
+                    if (cardSnapshot.hasChild("selectedCamera")) {
+                        String selectedCamera = cardSnapshot.child("selectedCamera").getValue(String.class);
+                        if (selectedCamera != null && !selectedCamera.equals("")) {
+                            String cardId = cardSnapshot.getKey(); // Get the unique card ID
+                            String cardText = cardSnapshot.child("cardText").getValue(String.class);
+                            String cardCamera = cardSnapshot.child("selectedCamera").getValue(String.class);
+                            String cardP1 = cardSnapshot.child("cardP1").getValue(String.class);
+                            String cardP2 = cardSnapshot.child("cardP2").getValue(String.class);
+                            String cardP3 = cardSnapshot.child("cardP3").getValue(String.class);
+                            String statusP1 = cardSnapshot.child("statusP1").getValue(String.class);
+                            String statusP2 = cardSnapshot.child("statusP2").getValue(String.class);
+                            String statusP3 = cardSnapshot.child("statusP3").getValue(String.class);
+                            // Create a CardItem object with the retrieved data
+                            UserCardItem cardItem = new UserCardItem(cardId, cardText);
+                            cardItem.setSelectedCamera(cardCamera);
+                            cardItem.setCardP1(cardP1);
+                            cardItem.setCardP2(cardP2);
+                            cardItem.setCardP3(cardP3);
+                            cardItem.setStatusP1(statusP1);
+                            cardItem.setStatusP2(statusP2);
+                            cardItem.setStatusP3(statusP3);
+                            updateFragmentUI(tabTitle, cardItem);
+                        }
+                    }
+
                 }
             }
 

@@ -9,67 +9,25 @@
 
     <include layout="@layout/toolbar"/>
 
-
-
-    <TextView
+    <FrameLayout
+        android:id="@+id/fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar"
-        android:id="@+id/recentitemtxt"
-        android:text="@string/recent_visited_places"
-        android:textSize="20sp"
-        android:fontFamily="sans-serif-medium"
-        android:layout_marginLeft="20dp"
-        android:shadowColor="#808080"
-        android:shadowDx="8"
-        android:shadowDy="4"
-        android:shadowRadius="3"
-        android:textColor="@color/cardColor"
-        />
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/horizontalRecyclerView_Main"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/recentitemtxt"
-        android:layout_marginTop="15dp"
-        android:layout_marginBottom="15dp"
-        android:orientation="horizontal"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-
-    <TextView
-        android:id="@+id/allitemtxt"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/horizontalRecyclerView_Main"
-        android:layout_marginLeft="20dp"
-        android:fontFamily="sans-serif-medium"
-        android:text="@string/all_parking_location"
-        android:shadowColor="#808080"
-        android:shadowDx="8"
-        android:shadowDy="4"
-        android:shadowRadius="3"
-        android:textColor="@color/cardColor"
-        android:textSize="20sp" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/verticalRecyclerView_Main"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="20dp"
-        android:layout_below="@+id/allitemtxt"
+        android:layout_height="664dp"
         android:layout_above="@+id/bottomNavMain"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginBottom="20dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        android:layout_below="@+id/toolbar"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="1dp"
+        android:layout_marginTop="63dp" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:id="@+id/bottomNavMain"
-        android:background="@color/custom_blue"
+        android:background="@color/custom_light_blue"
+        app:menu="@menu/bottom_nav"
+        app:itemBackground="@drawable/selected_item_bg"
+        app:itemTextColor="@color/black"
         android:layout_alignParentBottom="true"/>
 
 </RelativeLayout>

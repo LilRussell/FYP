@@ -6,6 +6,7 @@ import android.provider.ContactsContract;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class TestFragment extends Fragment {
@@ -44,7 +46,7 @@ public class TestFragment extends Fragment {
     private String currentCardId; // Store the current card ID
     private String parkingSlot;
     private String adminId;
-    private DatabaseReference cameraRef;
+    private DatabaseReference cameraRef,camerasRef;
     private ValueEventListener cameraListener;
     public TestFragment() {
         // Required empty public constructor
@@ -67,6 +69,7 @@ public class TestFragment extends Fragment {
         Bundle args = getArguments();
         if (args != null) {
             adminId = args.getString("adminIdKey");
+
         }
 
         for (CardItem cardItem : cardItemList) {
@@ -149,9 +152,12 @@ public class TestFragment extends Fragment {
             }
         };
 
-// Add the ValueEventListener to the cameraRef
+        // Add the ValueEventListener to the cameraRef
         cameraRef.addValueEventListener(cameraListener);
         return view;
+
+
+
     }
     @Override
     public void onDestroy() {
@@ -182,6 +188,129 @@ public class TestFragment extends Fragment {
             }
         }
     }
+    void DeleteCard(String cardId) {
+        currentCardId = cardId;
+
+        // Create a confirmation dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(recyclerView.getContext(),R.style.CustomAlertDialogTheme));
+        builder.setTitle("Confirm Deletion");
+        builder.setMessage("Are you sure you want to delete this parking section?");
+
+        // Add buttons for Yes and No
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // User clicked Yes, so delete the card
+                for (CardItem cardItem : cardItemList) {
+                    if (cardItem.getCardId().equals(currentCardId)) {
+                        String previouslySelectedCamera = cardItem.getSelectedCamera();
+                        if(previouslySelectedCamera!=null&&!previouslySelectedCamera.equals("")){
+                            deleteCardFromFirebase(currentCardId, previouslySelectedCamera);
+                        }else{
+                            deleteOnlyCardFromFirebase(currentCardId);
+                        }
+                    }
+                }
+                Iterator<CardItem> iterator = cardItemList.iterator();
+                while (iterator.hasNext()) {
+                    CardItem cardItem = iterator.next();
+                    if (cardItem.getCardId().equals(currentCardId)) {
+                        // Remove the cardItem from the list
+                        iterator.remove();
+                        break; // Stop the loop once the card is found and removed
+                    }
+                }
+
+            }
+        });
+
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // User clicked No, do nothing or handle as needed
+            }
+        });
+
+        // Create and show the dialog
+        AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+
+                // Set text color for positive button
+                positiveButton.setTextColor(getResources().getColor(R.color.black));
+
+                // Set text color for negative button
+                negativeButton.setTextColor(getResources().getColor(R.color.black));
+            }
+        });
+        dialog.show();
+    }
+
+    private void deleteCardFromFirebase(String cardId,String camera) {
+        Bundle args = getArguments(); // Retrieve fragment's arguments
+        if (args != null) {
+            String locationId = args.getString("locationId");
+            String tabTitle = args.getString("tabTitle");
+
+            if (locationId != null && tabTitle != null) {
+                // Remove the card from Firebase
+                DatabaseReference cardRef = FirebaseDatabase.getInstance().getReference()
+                        .child("location")
+                        .child(locationId)
+                        .child("details")
+                        .child("layout")
+                        .child(tabTitle)
+                        .child("card")
+                        .child(cardId);
+
+                cardRef.removeValue();
+                deleteCardFromCameraFirebase(camera);
+
+                // Show a toast message to indicate that the card has been deleted
+                Toast.makeText(requireContext(), "Parking section deleted successfully", Toast.LENGTH_SHORT).show();
+                adapter.notifyDataSetChanged();
+            }
+        }
+    }
+    private void deleteOnlyCardFromFirebase(String cardId) {
+        Bundle args = getArguments(); // Retrieve fragment's arguments
+        if (args != null) {
+            String locationId = args.getString("locationId");
+            String tabTitle = args.getString("tabTitle");
+
+            if (locationId != null && tabTitle != null) {
+                // Remove the card from Firebase
+                DatabaseReference cardRef = FirebaseDatabase.getInstance().getReference()
+                        .child("location")
+                        .child(locationId)
+                        .child("details")
+                        .child("layout")
+                        .child(tabTitle)
+                        .child("card")
+                        .child(cardId);
+
+                cardRef.removeValue();
+                // Show a toast message to indicate that the card has been deleted
+                Toast.makeText(requireContext(), "Parking section deleted successfully", Toast.LENGTH_SHORT).show();
+                adapter.notifyDataSetChanged();
+            }
+        }
+    }
+    private void deleteCardFromCameraFirebase(String selectedCameraName) {
+        if (selectedCameraName != null) {
+            DatabaseReference cameraRef = FirebaseDatabase.getInstance().getReference().child("camera").child(selectedCameraName);
+            // Update the assignedLocation and assignedCard fields to "None"
+            cameraRef.child("assignedLocation").setValue("None");
+            cameraRef.child("assignedCard").setValue("None");
+            cameraRef.child("assignedTab").setValue("None");
+        }
+    }
+
+
+
 
     void showCameraListDialog(String cardId) {
         currentCardId = cardId;
@@ -197,12 +326,13 @@ public class TestFragment extends Fragment {
 
         // Find views in the custom layout
         RadioGroup cameraListRadioGroup = customLayout.findViewById(R.id.camera_list);
-        Button addButton = customLayout.findViewById(R.id.add_button);
+        Button unbindButton = customLayout.findViewById(R.id.unbind_cam_btn);
         Button okButton = customLayout.findViewById(R.id.ok_button);
         Button cancelButton = customLayout.findViewById(R.id.cancel_button);
         TextView noCamerasTextView = customLayout.findViewById(R.id.txt_no_camera);
+
         // Set the title and other attributes for the AlertDialog
-        builder.setTitle("Add Camera");
+
 
         // Create and show the AlertDialog
         AlertDialog dialog = builder.create();
@@ -229,6 +359,7 @@ public class TestFragment extends Fragment {
                         String cameraName = cameraSnapshot.child("id").getValue(String.class);
 
                         if (cameraName != null) {
+                            Log.d("CameraListID",cameraName);
                             cameraNames.add(cameraName);
                             RadioButton radioButton = new RadioButton(requireContext());
                             radioButton.setText(cameraName);
@@ -250,17 +381,28 @@ public class TestFragment extends Fragment {
         });
 
         // Handle button clicks
-        addButton.setOnClickListener(new View.OnClickListener() {
+        unbindButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Handle the "ADD" button click
-                // You can add radio buttons to the RadioGroup dynamically here
-                // For example, assume camerasDataList is a list of camera names fetched from your database
-                for (String cameraName : cameraNames) {
-                    RadioButton radioButton = new RadioButton(requireContext());
-                    radioButton.setText(cameraName); // Set the text for the radio button
-                    cameraListRadioGroup.addView(radioButton);
+                for (CardItem cardItem : cardItemList) {
+                    if (cardItem.getCardId().equals(currentCardId)) {
+                        String previouslySelectedCamera = cardItem.getSelectedCamera();
+                        if (previouslySelectedCamera != null&&!previouslySelectedCamera.equals("None")&&!previouslySelectedCamera.equals("")) {
+                            unbindSelectedCameraFromFirebase(previouslySelectedCamera);
+                            Log.d("UnbindCamera", "Unbound camera: " + previouslySelectedCamera);
+                            cardItem.setSelectedCamera("");
+                            cardItem.setCardP1("Not Available");
+                            cardItem.setCardP2("Not Available");
+                            cardItem.setCardP3("Not Available");
+                        }else{
+                            Toast.makeText(v.getContext(), "No Bind Camera! Cannot Unbind!", Toast.LENGTH_LONG).show();
+                        }
+                        break; // Break the loop once the selected card is found
+                    }
                 }
+                        dialog.dismiss();
+
+                Log.d("cardID",currentCardId);
             }
         });
 
@@ -279,8 +421,20 @@ public class TestFragment extends Fragment {
                 }
                 // Now, you have the selected camera name in the 'selectedCameraName' variable
                 if (selectedCameraName != null) {
-                    updateSelectedCameraInFirebase(selectedCameraName);
-                    Log.d("SelectedCamera", "Selected camera: " + selectedCameraName);
+                    for (CardItem cardItem : cardItemList) {
+                        if (cardItem.getCardId().equals(currentCardId)) {
+                            String previouslySelectedCamera = cardItem.getSelectedCamera();
+                            if (previouslySelectedCamera!=null&&!previouslySelectedCamera.equals("")) {
+                                deleteCardFromCameraFirebase(previouslySelectedCamera);
+                                updateSelectedCameraInFirebase(selectedCameraName);
+                            }else {
+                                updateSelectedCameraInFirebase(selectedCameraName);
+                                Log.d("SelectedCamera", "Selected camera: " + selectedCameraName);
+                            }
+                        }
+
+                    }
+
                 }
 
                 dialog.dismiss();
@@ -297,8 +451,6 @@ public class TestFragment extends Fragment {
         });
     }
     private void updateSelectedCameraInFirebase(String newTitle) {
-
-
         Bundle args = getArguments(); // Retrieve fragment's arguments
         if (args != null) {
             String locationId = args.getString("locationId");
@@ -324,19 +476,53 @@ public class TestFragment extends Fragment {
                         .child("camera")
                         .child(newTitle)
                         .child("assignedCard");
-
+                DatabaseReference camRefTab = FirebaseDatabase.getInstance().getReference()
+                        .child("camera")
+                        .child(newTitle)
+                        .child("assignedTab");
 
                 camRefLoc.setValue(locationId);
                 camRefCard.setValue(currentCardId);
-
+                camRefTab.setValue(tabTitle);
                 for (CardItem cardItem : cardItemList) {
                     if (cardItem.getCardId().equals(currentCardId)) {
+
                         cardItem.setSelectedCamera(newTitle);
                         break; // Break the loop once the selected card is found
                     }
                 }adapter.notifyDataSetChanged();
 
 
+            }
+        }
+    }
+    private void unbindSelectedCameraFromFirebase(String selectedCameraName) {
+
+        Bundle args = getArguments(); // Retrieve fragment's arguments
+        if (args != null) {
+            String locationId = args.getString("locationId");
+            String tabTitle = args.getString("tabTitle");
+
+            if (selectedCameraName != null) {
+                DatabaseReference cameraRef = FirebaseDatabase.getInstance().getReference().child("camera").child(selectedCameraName);
+
+                // Update the assignedLocation and assignedCard fields to "None"
+                cameraRef.child("assignedLocation").setValue("None");
+                cameraRef.child("assignedCard").setValue("None");
+                cameraRef.child("assignedTab").setValue("None");
+                // Update the selectedCamera field in the card
+                DatabaseReference cardRef = FirebaseDatabase.getInstance().getReference()
+                        .child("location")
+                        .child(locationId)  // Make sure to replace 'locationId' with the actual value
+                        .child("details")
+                        .child("layout")
+                        .child(tabTitle)  // Make sure to replace 'tabTitle' with the actual value
+                        .child("card")
+                        .child(currentCardId);
+                cardRef.child("cardP1").setValue("Not Available");
+                cardRef.child("cardP2").setValue("Not Available");
+                cardRef.child("cardP3").setValue("Not Available");
+                cardRef.child("selectedCamera").setValue(""); // Update the selectedCamera field to "None" for the current card
             }
         }
     }
@@ -389,6 +575,7 @@ public class TestFragment extends Fragment {
         if (args != null) {
             String locationId = args.getString("locationId");
             String tabTitle = args.getString("tabTitle");
+            Log.d("ARGS",locationId+"tab title:"+tabTitle);
 
             if (locationId != null && tabTitle != null) {
                 DatabaseReference cardRef = FirebaseDatabase.getInstance().getReference()

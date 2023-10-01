@@ -35,4 +35,11 @@ public class TestTabAdapter extends FragmentPagerAdapter {
     public CharSequence getPageTitle(int position) {
         return fragmentTitleList.get(position);
     }
+    // Add this method to the TestTabAdapter class to remove a fragment at a specific position
+    public void removeFragment(int position) {
+        if (position >= 0 && position < fragmentList.size()) {
+            fragmentList.remove(position);
+            notifyDataSetChanged();
+        }
+    }
 }

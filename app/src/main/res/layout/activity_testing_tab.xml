@@ -21,39 +21,41 @@
         android:id="@+id/viewPager_test"
         android:layout_width="match_parent"
         android:layout_height="553dp"
-        android:layout_above="@+id/addTab_test"
+        android:layout_above="@+id/addTabButton"
         android:layout_below="@+id/tabLayout_test"
-        android:layout_marginBottom="8dp" />
+        />
     <FrameLayout
         android:id="@+id/radioGroupContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp" />
     <Button
-        android:id="@+id/addTab_test"
-        android:layout_width="124dp"
+        android:id="@+id/addTabButton"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
+        android:background="@drawable/cancel_btn"
+        android:text="@string/add_floor"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginStart="136dp"
-        android:layout_marginEnd="151dp"
-        android:layout_marginBottom="13dp"
-        android:text="@string/add_floor" />
+        android:layout_centerHorizontal="true"/>
 
     <Button
-        android:id="@+id/addCard_test"
-        android:layout_width="124dp"
+        android:id="@+id/addParkingBox"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
+        android:background="@drawable/cancel_btn"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginStart="263dp"
-        android:layout_marginEnd="23dp"
-        android:layout_marginBottom="13dp"
-        android:text="@string/addcard" />
+        android:layout_toRightOf="@id/addTabButton"
+        android:text="@string/add_section" />
+    <Button
+        android:id="@+id/deleteTabButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/addTabButton"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/cancel_btn"
+        android:layout_alignParentStart="true"
+        android:text="@string/delete_floor" />
 
 
 

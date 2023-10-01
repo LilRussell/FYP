@@ -4,37 +4,50 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
-
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/custom_title"
+        android:text="@string/select_a_camera_to_bind"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="20sp"
+        />
     <RadioButton
         android:id="@+id/radioButtonOption1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
         android:text="@string/normal_parking" />
 
     <RadioButton
         android:id="@+id/radioButtonOption2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
         android:text="@string/disabled_parking" />
     <RadioButton
         android:id="@+id/radioButtonOption3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
         android:text="@string/reserved_parking" />
     <RadioButton
         android:id="@+id/radioButtonOption4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
         android:text="@string/family_parking" />
     <RadioButton
         android:id="@+id/radioButtonOption5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
         android:text="@string/ladies_parking" />
     <RadioButton
         android:id="@+id/radioButtonOption6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
         android:text="@string/not_available" />
 
 

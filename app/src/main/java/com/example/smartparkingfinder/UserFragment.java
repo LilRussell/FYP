@@ -33,6 +33,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +45,9 @@ public class UserFragment extends Fragment {
     private UserFragment fragment;
     private DatabaseReference cameraRef;
     private ValueEventListener cameraListener;
+    private Button findCardButton;
+    private int lastScrolledPosition = -1;
+
     public UserFragment() {
         // Required empty public constructor
     }
@@ -57,13 +61,18 @@ public class UserFragment extends Fragment {
         // Initialize the RecyclerView and cardItemList
         recyclerView = view.findViewById(R.id.RV_parking);
         cardItemList = new ArrayList<>();
-        adapter = new UserCardAdapter(cardItemList, fragment); // Pass the context
+        adapter = new UserCardAdapter(cardItemList, fragment,recyclerView); // Pass the context
 
         // Set up the RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(adapter);
-
-
+        findCardButton= view.findViewById(R.id.btn_findCard);
+        findCardButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                scrollToFirstEmptySlotCard();
+            }
+        });
         for (UserCardItem cardItem : cardItemList) {
             Log.d("CardItemID", "Card ID: " + cardItem.getCardId());
         }
@@ -190,5 +199,38 @@ public class UserFragment extends Fragment {
         }
 
         Log.d("CardItemCount", "Number of items in cardItemList: " + cardItemList.size());
+    }
+    private void scrollToFirstEmptySlotCard() {
+        int startPosition = lastScrolledPosition + 1; // Start from the next position
+
+        for (int i = startPosition; i < cardItemList.size(); i++) {
+            UserCardItem cardItem = cardItemList.get(i);
+            if ("Empty".equals(cardItem.getStatusP1()) || "Empty".equals(cardItem.getStatusP2()) || "Empty".equals(cardItem.getStatusP3())) {
+                // Scroll to the card with an empty slot
+                adapter.scrollToPosition(i);
+                cardItem.setHighlighted(true);
+                // Notify the adapter to update the view
+                adapter.notifyDataSetChanged();
+                lastScrolledPosition = i; // Update the last scrolled position
+                return; // Stop searching after the first card with an empty slot is found
+            }
+        }
+
+        // If no empty card is found in the remaining items, wrap around to the beginning
+        for (int i = 0; i < startPosition; i++) {
+            UserCardItem cardItem = cardItemList.get(i);
+            if ("Empty".equals(cardItem.getStatusP1()) || "Empty".equals(cardItem.getStatusP2()) || "Empty".equals(cardItem.getStatusP3())) {
+                // Scroll to the card with an empty slot
+                adapter.scrollToPosition(i);
+                cardItem.setHighlighted(true);
+                // Notify the adapter to update the view
+                adapter.notifyDataSetChanged();
+                lastScrolledPosition = i; // Update the last scrolled position
+                return; // Stop searching after the first card with an empty slot is found
+            }
+        }
+
+        // Show a message if no card with an empty slot is found
+        Toast.makeText(requireContext(), "No card with an empty slot found", Toast.LENGTH_SHORT).show();
     }
 }

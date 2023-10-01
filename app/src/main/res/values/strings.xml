@@ -39,5 +39,15 @@
     <string name="all_parking_location">All Parking Location</string>
     <string name="recent_visited_places">Recent Visited Places</string>
     <string name="search">Search</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="profiles">Profiles</string>
+    <string name="car">Car</string>
+    <string name="select_a_camera_to_bind">Select A Camera To Bind</string>
+    <string name="unbind">Unbind</string>
+    <string name="cancel">CANCEL</string>
+    <string name="ok">OK</string>
+    <string name="add_section">Add Section</string>
+    <string name="delete_floor">Delete Floor</string>
 
 </resources>

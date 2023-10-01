@@ -10,6 +10,7 @@ public class UserCardItem {
     private String statusP1;
     private String statusP2;
     private String statusP3;
+    private boolean isHighlighted = false;
     public UserCardItem(String cardId, String cardText) {
         this.cardId = cardId;
         this.cardText = cardText;
@@ -77,6 +78,14 @@ public class UserCardItem {
     }
     public void setStatusP3(String statusP3){
         this.statusP3=statusP3;
+    }
+
+    public boolean isHighlighted() {
+        return isHighlighted;
+    }
+
+    public void setHighlighted(boolean highlighted) {
+        isHighlighted = highlighted;
     }
 
 

@@ -56,10 +56,18 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
         Button button3 = holder.itemView.findViewById(R.id.btn_chg_parking3);
         ImageView editTitleImageView = holder.itemView.findViewById(R.id.edit_IV_Title); // Replace with your ImageView ID
         ImageView editCameraImageView = holder.itemView.findViewById(R.id.edit_IV_Camera);
+        ImageView deleteCardImageView = holder.itemView.findViewById(R.id.IV_Delete);
         editTitleImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 testFragment.updateCardTitle(currentCardId);
+            }
+        });
+        deleteCardImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                testFragment.DeleteCard(currentCardId);
             }
         });
         editCameraImageView.setOnClickListener(new View.OnClickListener() {
@@ -152,6 +160,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
         } else {
             if (textView != null) {
                 textView.setText(camera);
+                button.setEnabled(true);
             }
         }
     }

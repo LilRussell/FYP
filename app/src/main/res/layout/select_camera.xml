@@ -2,8 +2,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:background="@color/cardColor"
     android:orientation="vertical">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/select_a_camera_to_bind"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="20sp"
+       android:gravity="center"
+        android:id="@+id/custom_title"
 
+        />
 
     <!-- Radio Button List -->
 
@@ -24,7 +34,8 @@
         android:text="@string/no_available_cameras"
         android:gravity="center"
         android:textStyle="bold"
-
+        android:textSize="30dp"
+        android:layout_marginBottom="10dp"
         />
 
     <!-- Buttons -->
@@ -34,11 +45,13 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/add_button"
+            android:id="@+id/unbind_cam_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="ADD"
+
+            android:background="@drawable/cancel_btn"
+            android:text="@string/unbind"
             android:onClick="onAddClick" />
 
         <Button
@@ -46,7 +59,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="OK"
+
+            android:background="@drawable/cancel_btn"
+            android:text="@string/ok"
             android:onClick="onOkClick" />
 
         <Button
@@ -54,7 +69,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="CANCEL"
+            android:background="@drawable/cancel_btn"
+            android:text="@string/cancel"
             android:onClick="onCancelClick" />
     </LinearLayout>
 </LinearLayout>

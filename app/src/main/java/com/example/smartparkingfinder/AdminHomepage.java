@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -38,7 +39,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AdminHomepage extends AppCompatActivity {
     private Button addlocationBtn;
@@ -76,7 +79,7 @@ public class AdminHomepage extends AppCompatActivity {
         // Initialize Firebase
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference("location");
-
+        DatabaseReference cameraRef = database.getReference("camera");
         // Initialize the adapter
         adapter = new adminadapter(this, new ArrayList<>());
         mRecyclerView.setAdapter(adapter);
@@ -89,6 +92,61 @@ public class AdminHomepage extends AppCompatActivity {
             }
         });
 
+
+        cameraRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot cameraSnapshot) {
+                // Initialize a map to store the total empty status count for each location
+                Map<String, Integer> locationEmptyCounts = new HashMap<>();
+
+                // Iterate through camera data
+                for (DataSnapshot cameraDataSnapshot : cameraSnapshot.getChildren()) {
+                    String assignedLocation = cameraDataSnapshot.child("assignedLocation").getValue(String.class);
+                    String statusA = cameraDataSnapshot.child("statusA").getValue(String.class);
+                    String statusB = cameraDataSnapshot.child("statusB").getValue(String.class);
+                    String statusC = cameraDataSnapshot.child("statusC").getValue(String.class);
+
+                    int emptyCount = 0;
+
+                    // Check if statusA is "Empty" and increment the count
+                    if ("Empty".equals(statusA)) {
+                        emptyCount++;
+                    }
+
+                    // Check if statusB is "Empty" and increment the count
+                    if ("Empty".equals(statusB)) {
+                        emptyCount++;
+                    }
+
+                    // Check if statusC is "Empty" and increment the count
+                    if ("Empty".equals(statusC)) {
+                        emptyCount++;
+                    }
+
+                    // Update the total empty status count for the assigned location
+                    if (assignedLocation != null&&!assignedLocation.equals("None")) {
+                        locationEmptyCounts.put(assignedLocation, locationEmptyCounts.getOrDefault(assignedLocation, 0) + emptyCount);
+                    }
+                }
+
+                // Now, locationEmptyCounts contains the total count of "Empty" statuses for each assigned location
+                // You can iterate through the map and update the parking availability for each location
+                for (Map.Entry<String, Integer> entry : locationEmptyCounts.entrySet()) {
+                    String locationId = entry.getKey();
+                    int totalEmptyCount = entry.getValue();
+
+                    DatabaseReference currentLocationRef = reference.child(locationId);
+                    currentLocationRef.child("details").child("parkingAvailability").setValue(totalEmptyCount);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle errors here
+            }
+        });
+
+
         // Retrieve data from Firebase
         reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -97,7 +155,9 @@ public class AdminHomepage extends AppCompatActivity {
 
                 for (DataSnapshot locationSnapshot : dataSnapshot.getChildren()) {
                     String locationId = locationSnapshot.getKey(); // Get the location ID
+                    if (locationId != null) {
 
+                    }
                     // Access the "details" node under the location ID
                     DataSnapshot detailsSnapshot = locationSnapshot.child("details");
 
@@ -106,11 +166,11 @@ public class AdminHomepage extends AppCompatActivity {
                     Integer parkingAvailabilityObj = detailsSnapshot.child("parkingAvailability").getValue(Integer.class);
                     String imageURL = detailsSnapshot.child("imageURL").getValue(String.class);
 
-                    int parkingAvailability = (parkingAvailabilityObj != null) ? parkingAvailabilityObj.intValue() : 0;
+
 
                     if (locationId != null && name != null && description != null) {
                         Log.d("Get Location", "Got Value");
-                        locationRVModel locationData = new locationRVModel(locationId, name, description, parkingAvailability, imageURL);
+                        locationRVModel locationData = new locationRVModel(locationId, name, description, parkingAvailabilityObj, imageURL);
                         locationDataList.add(locationData);
                     }
                 }
@@ -125,7 +185,6 @@ public class AdminHomepage extends AppCompatActivity {
             }
         });
     }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater=getMenuInflater();
@@ -259,11 +318,11 @@ public class AdminHomepage extends AppCompatActivity {
     }
     private void showInputDialog() {
         // Create an AlertDialog builder
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.CustomAlertDialogTheme));
 
         // Set dialog title and message
-        builder.setTitle("Input Dialog");
-        builder.setMessage("Please enter your text:");
+        builder.setTitle("Register Your Camera");
+        builder.setMessage("Please enter your CameraID:");
 
         // Create an EditText widget for text input
         final EditText inputEditText = new EditText(this);
@@ -283,6 +342,9 @@ public class AdminHomepage extends AppCompatActivity {
                 camerasRef.child("ownedBy").setValue(adminId);
                 camerasRef.child("assignedLocation").setValue("None");
                 camerasRef.child("assignedCard").setValue("None");
+                camerasRef.child("statusA").setValue("");
+                camerasRef.child("statusB").setValue("");
+                camerasRef.child("statusC").setValue("");
                 // Close the dialog
                 dialog.dismiss();
             }
@@ -299,6 +361,19 @@ public class AdminHomepage extends AppCompatActivity {
 
         // Create and show the dialog
         AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+
+                // Set text color for positive button
+                positiveButton.setTextColor(getResources().getColor(R.color.black));
+
+                // Set text color for negative button
+                negativeButton.setTextColor(getResources().getColor(R.color.black));
+            }
+        });
         dialog.show();
     }
 
