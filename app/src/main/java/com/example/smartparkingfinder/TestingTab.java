@@ -17,6 +17,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.ViewPager;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.database.DataSnapshot;
@@ -39,6 +40,8 @@ public class TestingTab extends AppCompatActivity {
     private int count=0;
     private int tabCount=0;
     private List<TabInfo> tabInfoList = new ArrayList<>();
+    private List<Fragment> fragments = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -130,58 +133,98 @@ public class TestingTab extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 int currentItem = viewPager.getCurrentItem();
-                if (currentItem >= 0 && currentItem < tabInfoList.size()) {
-                    String currentTabId = tabInfoList.get(currentItem).getId();
-                    if (currentTabId != null) {
-                        // Create a confirmation dialog
-                        AlertDialog.Builder builder = new AlertDialog.Builder(TestingTab.this);
-                        builder.setTitle("Confirm Deletion");
-                        builder.setMessage("Are you sure you want to delete this tab?");
+                deleteTabAndUpdateViewPager(currentItem);
 
-                        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                updateCamerasForDeletedTab(currentTabId);
-                                // User clicked Yes, delete the tab from Firebase and remove it from the list
-                                deleteTabFromFirebase(locationRef, currentTabId);
-                                removeTabFromList(currentItem);
-                                // Notify the adapter of the data set change
-
-                                adapter.notifyDataSetChanged();
-                            }
-                        });
-
-                        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                // User clicked No, do nothing
-                            }
-                        });
-                        // Show the confirmation dialog
-                        builder.create().show();
-                    } else {
-                        // Handle the case where currentTabId is null
-                        Toast.makeText(TestingTab.this, "Tab ID is null.", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    // Handle the case where currentItem is out of bounds
-                    Toast.makeText(TestingTab.this, "Invalid tab index.", Toast.LENGTH_SHORT).show();
-                }
             }
         });
     }
-    private void removeTabFromList(int position) {
-        // Remove the tab from the TabLayout
-        TabLayout.Tab tabToRemove = tabLayout.getTabAt(position);
-        if (tabToRemove != null) {
-            tabLayout.removeTab(tabToRemove);
+    private void deleteTabAndUpdateViewPager(int position) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference locationRef = database.getReference("location").child(locationId);
+        if (position >= 0 && position < tabInfoList.size()) {
+            String currentTabId = tabInfoList.get(position).getId();
+            if (currentTabId != null) {
+                // Create a confirmation dialog
+                AlertDialog.Builder builder = new AlertDialog.Builder(TestingTab.this);
+                builder.setTitle("Confirm Deletion");
+                builder.setMessage("Are you sure you want to delete this tab?");
+
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // User confirmed deletion
+
+
+                        updateCamerasForDeletedTab(currentTabId);
+                        deleteTabFromFirebase(locationRef, currentTabId);
+                        // Clear all fragments from the ViewPager
+                        tabLayout.removeAllTabs();
+                        tabLayout.clearOnTabSelectedListeners();
+                        adapter.clearFragments();
+                        tabInfoList.clear();
+                        tabCount--; // Decrement the fragment count
+                        viewPager.setOffscreenPageLimit(tabCount);
+                        adapter = new TestTabAdapter(getSupportFragmentManager());
+                        viewPager.setAdapter(adapter);
+                        tabLayout.setupWithViewPager(viewPager);
+                        loadTabsAndCardsFromFirebase(locationRef);
+
+                        TabLayout.Tab tabToRemove = tabLayout.getTabAt(position);
+                        if (tabToRemove != null) {
+                            tabLayout.removeTab(tabToRemove);
+                        }
+                        // Notify the adapter that the data set has changed
+                        adapter.notifyDataSetChanged();
+                        if (position < adapter.getCount()) {
+                            viewPager.setCurrentItem(position);
+                        } else if (position > 0) {
+                            viewPager.setCurrentItem(position - 1);
+                        }
+                        for (TabInfo tabInfo : tabInfoList) {
+                            tabLayout.addTab(tabLayout.newTab().setText(tabInfo.getTitle()));
+                        }
+                    }
+                });
+
+                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // User clicked No, do nothing
+                    }
+                });
+
+                // Show the confirmation dialog
+                builder.create().show();
+            } else {
+                // Handle the case where currentTabId is null
+                Toast.makeText(TestingTab.this, "Tab ID is null.", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            // Handle the case where currentItem is out of bounds
+            Toast.makeText(TestingTab.this, "Invalid tab index.", Toast.LENGTH_SHORT).show();
         }
+    }private void removeTabFromList(int position) {
+        if (position >= 0 && position < tabInfoList.size()) {
+            // Remove the tab from the TabLayout
+            TabLayout.Tab tabToRemove = tabLayout.getTabAt(position);
+            if (tabToRemove != null) {
+                tabLayout.removeTab(tabToRemove);
+            }
 
-        // Remove the fragment associated with the deleted tab
-        adapter.removeFragment(position);
+            // Remove the fragment associated with the deleted tab from the adapter
+            adapter.removeFragment(position);
 
-        // Notify the adapter that the data set has changed
-        adapter.notifyDataSetChanged();
+            // Remove the item from the tabInfoList
+            tabInfoList.remove(position);
+
+            // Shift the positions of remaining tabs in tabInfoList to maintain order
+            for (int i = position; i < tabInfoList.size(); i++) {
+                tabInfoList.get(i).setPosition(i);
+            }
+
+            // Notify the adapter that the data set has changed
+            adapter.notifyDataSetChanged();
+        }
     }
 
 
@@ -234,6 +277,7 @@ public class TestingTab extends AppCompatActivity {
 
         // Add the fragment to the adapter and notify the adapter of the data set change
         adapter.addFragment(fragment, tabTitle);
+        fragments.add(fragment);
         adapter.notifyDataSetChanged();
     }
 
@@ -244,6 +288,7 @@ public class TestingTab extends AppCompatActivity {
         viewPager.setOffscreenPageLimit(Count);
         adapter.addFragment(fragment, title);
         saveTabToFirebase(locationRef, title);
+        fragments.add(fragment);
         // Notify the adapter that the data set has changed
         adapter.notifyDataSetChanged();
 
@@ -262,13 +307,7 @@ public class TestingTab extends AppCompatActivity {
         TabInfo tabInfo = new TabInfo(tabid, tabTitle);
         tabInfoList.add(tabInfo);
 
-        TestFragment fragment = new TestFragment();
-        Bundle args = new Bundle();
-        args.putString("locationId", locationId); // Pass the locationId
-        args.putString("tabTitle", tabid); // Generate a unique tab title
-        String adminIdToCard = adminId; // Replace with the actual admin ID
-        args.putString("adminIdKey", adminIdToCard);
-        fragment.setArguments(args);
+
     }
     private void saveCardToFirebase(DatabaseReference locationRef, String currentTabId, int CardCount,Fragment currentFragment) {
         // Get a reference to the "cards" section under the selected tab

@@ -3,7 +3,7 @@ package com.example.smartparkingfinder;
 public class TabInfo {
     private String id;
     private String title;
-
+    private int position;
     public TabInfo() {
         // Default constructor required for Firebase
     }
@@ -27,5 +27,8 @@ public class TabInfo {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+    public void setPosition(int position) {
+        this.position = position;
     }
 }
