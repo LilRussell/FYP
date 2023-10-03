@@ -31,8 +31,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         HistoryItem historyItem = historyItemList.get(position);
 
         holder.carNameTextView.setText(historyItem.getCarName());
-        holder.locationTextView.setText("Location: " + historyItem.getCardName()+historyItem.getFragmentName());
-        holder.timeTextView.setText("Time: " + historyItem.getTimestamp());
+        holder.locationTextView.setText(historyItem.getFragmentName()+"/"+historyItem.getCardName());
+        holder.timeTextView.setText(historyItem.getTimestamp());
     }
 
     @Override

@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
                         argsH.putString("userID", UID);
                         homeFragment.setArguments(argsH);
                         loadFragment(homeFragment);
+                        toolbar.setTitle("Smart Parking Finder");
                         // Replace the fragment container with the HomeFragment if needed
                         return true;
                     case R.id.car:
@@ -60,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
                         args.putString("userID", UID); // Pass the UID to the fragment
                         carfragment.setArguments(args); // Set the arguments
                         loadFragment(carfragment);
+                        toolbar.setTitle("Car Registration");
                         return true;
 
                     case R.id.history:
@@ -69,11 +71,13 @@ public class MainActivity extends AppCompatActivity {
                         Bundle argsHis = new Bundle();
                         argsHis.putString("userID", UID);
                         historyFragment.setArguments(argsHis);
+                        toolbar.setTitle("History Log");
                         // Replace the fragment container with the ProfileFragment if needed
                         return true;
                     case R.id.profiles:
                         // Handle the profile tab
                         loadFragment(new ProfileFragment());
+                        toolbar.setTitle("My Profile");
                         // Replace the fragment container with the ProfileFragment if needed
                         return true;
                 }

@@ -77,6 +77,7 @@ public class User_Parking_Location extends AppCompatActivity {
         Bundle args = new Bundle();
         args.putString("locationId", locationId); // Pass the locationId
         args.putString("tabTitle", tabId); // Generate a unique tab title
+        args.putString("locationName",locationName);
         args.putString("userID",userID);
         Log.d("passID",userID);
         fragment.setArguments(args);

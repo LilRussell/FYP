@@ -71,7 +71,6 @@ public class UserFragment extends Fragment {
         if (argsH != null) {
             fragmentName = argsH.getString("locationName");
             userID=argsH.getString("userID");
-
         }
 
 
@@ -317,12 +316,7 @@ public class UserFragment extends Fragment {
         Toast.makeText(requireContext(), "No card with an empty slot found", Toast.LENGTH_SHORT).show();
     }
     public void btnparkedFunction(UserCardItem cardItem) {
-        Bundle args = getArguments();
-        if (args != null) {
-            fragmentName = args.getString("locationName");
-           // userID=args.getString("UserID");
-           // Log.d("btnParked",userID);
-        }
+
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Confirm Parking");
         builder.setMessage("Do you want to confirm parking at " + cardItem.getCardText() + "?");
@@ -351,11 +345,11 @@ public class UserFragment extends Fragment {
 
                                     String dateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
                                             .format(new Date(currentTimeMillis));
-
+                                    String title= fragmentName;
                                     // 2. Upload the information to the "history" node
                                     DatabaseReference historyRef = FirebaseDatabase.getInstance().getReference().child("history");
                                     String historyKey = historyRef.push().getKey(); // Generate a unique key
-                                    HistoryItem historyItem = new HistoryItem(userID,carNum,cardItem.getCardText(),"test",dateTime);
+                                    HistoryItem historyItem = new HistoryItem(userID,carNum,cardItem.getCardText(),title,dateTime);
                                     historyRef.child(historyKey).setValue(historyItem);
                                 }
 
