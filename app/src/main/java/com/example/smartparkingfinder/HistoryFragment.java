@@ -41,7 +41,12 @@ public class HistoryFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_history, container, false);
+        Bundle argsHis = getArguments();
+        if (argsHis != null) {
+            userID = argsHis.getString("userID");
+            Log.d("passIDFromHistory",userID);
 
+        }
         // Initialize RecyclerView and historyItemList
         recyclerView = view.findViewById(R.id.RV_history);
         historyItemList = new ArrayList<>();
@@ -61,7 +66,7 @@ public class HistoryFragment extends Fragment {
         Bundle argsHis = getArguments();
         if (argsHis != null) {
             userID = argsHis.getString("userID");
-            Log.d("passID",userID);
+            Log.d("passIDFromHistory",userID);
 
         }
         // Replace this with the reference to your Firebase database path
@@ -79,13 +84,18 @@ public class HistoryFragment extends Fragment {
                     String cardName = historySnapshot.child("cardName").getValue(String.class);
                     String floor = historySnapshot.child("fragmentName").getValue(String.class);
                     String time = historySnapshot.child("timestamp").getValue(String.class);
+                    String location = historySnapshot.child("location").getValue(String.class);
+                    String firebaseUserID = historySnapshot.child("userId").getValue(String.class);
 
-                    // Create a HistoryItem object and add it to the list
-                    HistoryItem historyItem = new HistoryItem(userID, numberplate, cardName, floor, time);
-                    newItems.add(historyItem);
+                    // Check if the userID from Firebase matches the current userID
+                    if (firebaseUserID != null && firebaseUserID.equals(userID)) {
+                        // Create a HistoryItem object and add it to the list
+                        HistoryItem historyItem = new HistoryItem(userID, numberplate, cardName, floor, location, time);
+                        newItems.add(0,historyItem);
+                    }
                 }
                 // Clear the existing list
-                historyItemList.clear();
+
 
                 // Add the new items to the top of the list
                 historyItemList.addAll(0, newItems);

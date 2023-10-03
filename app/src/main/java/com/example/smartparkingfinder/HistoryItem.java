@@ -6,17 +6,18 @@ public class HistoryItem {
     private String cardName;
     private String fragmentName;
     private String timestamp;
-
+    private String location;
     public HistoryItem() {
         // Default constructor required for Firebase
     }
 
-    public HistoryItem(String userId, String carName, String cardName, String fragmentName, String timestamp) {
+    public HistoryItem(String userId, String carName, String cardName, String fragmentName,String location, String timestamp) {
         this.userId = userId;
         this.carName = carName;
         this.cardName = cardName;
         this.fragmentName = fragmentName;
         this.timestamp = timestamp;
+        this.location = location;
     }
 
     public String getUserId() {
@@ -54,9 +55,16 @@ public class HistoryItem {
     public String getTimestamp() {
         return timestamp;
     }
-
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
+    public void setTimestamp(String location) {
+        this.location = location;
     }
+    public void setLocation(String location) {
+        this.location = location;
+    }
+    public String getLocation() {
+        return location;
+    }
+
+
 }
 

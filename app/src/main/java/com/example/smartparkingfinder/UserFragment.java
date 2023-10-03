@@ -58,6 +58,7 @@ public class UserFragment extends Fragment {
     private TextView parkingCount;
     private String fragmentName;
     private String userID ;
+    private String tabtitle;
     //="syu2kx0k6cNWc8FuUe67RIfcFxx2"
     public UserFragment() {
         // Required empty public constructor
@@ -71,6 +72,7 @@ public class UserFragment extends Fragment {
         if (argsH != null) {
             fragmentName = argsH.getString("locationName");
             userID=argsH.getString("userID");
+            tabtitle=argsH.getString("fragmentName");
         }
 
 
@@ -345,11 +347,11 @@ public class UserFragment extends Fragment {
 
                                     String dateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
                                             .format(new Date(currentTimeMillis));
-                                    String title= fragmentName;
+                                    String title= tabtitle;
                                     // 2. Upload the information to the "history" node
                                     DatabaseReference historyRef = FirebaseDatabase.getInstance().getReference().child("history");
                                     String historyKey = historyRef.push().getKey(); // Generate a unique key
-                                    HistoryItem historyItem = new HistoryItem(userID,carNum,cardItem.getCardText(),title,dateTime);
+                                    HistoryItem historyItem = new HistoryItem(userID,carNum,cardItem.getCardText(),title,fragmentName,dateTime);
                                     historyRef.child(historyKey).setValue(historyItem);
                                 }
 

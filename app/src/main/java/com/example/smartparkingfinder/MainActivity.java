@@ -66,13 +66,14 @@ public class MainActivity extends AppCompatActivity {
 
                     case R.id.history:
                         // Handle the profile tab
-                        loadFragment(new HistoryFragment());
+
                         HistoryFragment historyFragment = new HistoryFragment();
                         Bundle argsHis = new Bundle();
                         argsHis.putString("userID", UID);
                         historyFragment.setArguments(argsHis);
                         toolbar.setTitle("History Log");
                         // Replace the fragment container with the ProfileFragment if needed
+                        loadFragment(historyFragment);
                         return true;
                     case R.id.profiles:
                         // Handle the profile tab

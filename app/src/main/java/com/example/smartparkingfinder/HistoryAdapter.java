@@ -29,9 +29,9 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         HistoryItem historyItem = historyItemList.get(position);
-
+        String location= historyItem.getLocation()+"/"+historyItem.getFragmentName()+"/"+historyItem.getCardName();
         holder.carNameTextView.setText(historyItem.getCarName());
-        holder.locationTextView.setText(historyItem.getFragmentName()+"/"+historyItem.getCardName());
+        holder.locationTextView.setText(location);
         holder.timeTextView.setText(historyItem.getTimestamp());
     }
 
