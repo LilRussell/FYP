@@ -93,11 +93,13 @@ public class Login extends AppCompatActivity {
                     else if (role.equals("superadmin")) {
                         // User is an admin, go to AdminHomepage
                         Intent intent = new Intent(Login.this, SuperAdmin.class);
+
                         startActivity(intent);
                     }
                     else {
                         // User is a regular user, go to MainActivity
                         Intent intent = new Intent(Login.this, MainActivity.class);
+                        intent.putExtra("userID",uid);
                         startActivity(intent);
                     }
                     finish(); // Close the login activity

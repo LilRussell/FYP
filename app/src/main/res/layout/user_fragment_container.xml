@@ -5,11 +5,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
-
+<TextView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/txt_parking_count"
+    android:textSize="15sp"
+    android:fontFamily="sans-serif-medium"
+    android:textColor="@color/black"
+    android:gravity="center"
+    />
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/RV_parking"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_below="@id/txt_parking_count"/>
 
     <Button
         android:id="@+id/btn_findCard"

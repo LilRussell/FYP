@@ -33,7 +33,7 @@ public class User_Parking_Location extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private UserTabAdapter adapter;
-    private String locationId,locationName;
+    private String locationId,locationName,userID;
 
     private Toolbar toolbar;
     private int count=0;
@@ -47,6 +47,8 @@ public class User_Parking_Location extends AppCompatActivity {
 
         locationId = getIntent().getStringExtra("locationId");
         locationName = getIntent().getStringExtra("locationName").toUpperCase(Locale.ROOT);
+        userID = getIntent().getStringExtra("userID");
+
         Log.d("title",locationName);
         toolbar.setTitle(locationName);
         setSupportActionBar(toolbar);
@@ -75,6 +77,8 @@ public class User_Parking_Location extends AppCompatActivity {
         Bundle args = new Bundle();
         args.putString("locationId", locationId); // Pass the locationId
         args.putString("tabTitle", tabId); // Generate a unique tab title
+        args.putString("userID",userID);
+        Log.d("passID",userID);
         fragment.setArguments(args);
 
         // Add the fragment to the adapter and notify the adapter of the data set change
@@ -141,6 +145,9 @@ public class User_Parking_Location extends AppCompatActivity {
                             cardItem.setStatusP1(statusP1);
                             cardItem.setStatusP2(statusP2);
                             cardItem.setStatusP3(statusP3);
+                            cardItem.setDefaultCar("Test");
+                            cardItem.setCardName("Test");
+                            cardItem.setFragmentName("Test");
                             updateFragmentUI(tabTitle, cardItem);
                         }
                     }

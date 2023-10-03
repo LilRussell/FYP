@@ -33,7 +33,7 @@ public class HomeFragment extends Fragment {
     private String mParam1;
     private String mParam2;
     private UserAdapter adapter;
-
+    private String userID;
     private RecyclerView mRecyclerView,HorizontalRV;
     public HomeFragment() {
         // Required empty public constructor
@@ -77,7 +77,12 @@ public class HomeFragment extends Fragment {
         adapter = new UserAdapter(requireContext(), new ArrayList<>());
         mRecyclerView.setAdapter(adapter);
         HorizontalRV.setAdapter(adapter);
+        Bundle argsH = getArguments();
+        if (argsH != null) {
+            userID = argsH.getString("userID");
+            Log.d("passID",userID);
 
+        }
         // Set an item click listener for the adapter
         adapter.setOnItemClickListener(new UserAdapter.OnItemClickListener() {
             @Override
@@ -89,6 +94,7 @@ public class HomeFragment extends Fragment {
                 Intent intent = new Intent(requireActivity(), User_Parking_Location.class);
                 intent.putExtra("locationId", selectedLocationId);
                 intent.putExtra("locationName", selectedLocationTitle);
+                intent.putExtra("userID",userID);
                 startActivity(intent);
             }
         });

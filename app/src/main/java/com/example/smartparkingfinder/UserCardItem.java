@@ -11,9 +11,15 @@ public class UserCardItem {
     private String statusP2;
     private String statusP3;
     private boolean isHighlighted = false;
+    private String defaultCar;
+    private String fragmentName;
+    private String cardName;
+
+
     public UserCardItem(String cardId, String cardText) {
         this.cardId = cardId;
         this.cardText = cardText;
+
     }
 
     public String getCardId() {
@@ -86,6 +92,29 @@ public class UserCardItem {
 
     public void setHighlighted(boolean highlighted) {
         isHighlighted = highlighted;
+    }
+    public String getDefaultCar() {
+        return defaultCar;
+    }
+
+    public void setDefaultCar(String defaultCar) {
+        this.defaultCar = defaultCar;
+    }
+
+    public String getFragmentName() {
+        return fragmentName;
+    }
+
+    public void setFragmentName(String fragmentName) {
+        this.fragmentName = fragmentName;
+    }
+
+    public String getCardName() {
+        return cardName;
+    }
+
+    public void setCardName(String cardName) {
+        this.cardName = cardName;
     }
 
 

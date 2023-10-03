@@ -14,54 +14,6 @@
         android:layout_width="407dp"
         android:layout_height="235dp">
 
-        <TextView
-            android:id="@+id/txtParking1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="37dp"
-            android:layout_marginTop="196dp"
-            android:fontFamily="sans-serif-medium"
-
-            android:shadowColor="#808080"
-            android:shadowDx="2"
-            android:shadowDy="4"
-            android:shadowRadius="3"
-            android:text="TextView" />
-
-        <TextView
-            android:id="@+id/txtParking2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="165dp"
-            android:layout_marginTop="195dp"
-            android:fontFamily="sans-serif-medium"
-
-            android:shadowColor="#808080"
-            android:shadowDx="2"
-            android:shadowDy="4"
-            android:shadowRadius="3"
-            android:text="TextView" />
-
-        <TextView
-            android:id="@+id/txtParking3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="194dp"
-            android:layout_marginEnd="41dp"
-            android:fontFamily="sans-serif-medium"
-
-            android:shadowColor="#808080"
-            android:shadowDx="2"
-            android:shadowDy="4"
-            android:shadowRadius="3"
-            android:text="TextView" />
-
         <ImageView
             android:id="@+id/IV_Parking1"
             android:layout_width="106dp"
@@ -143,6 +95,16 @@
             android:layout_marginBottom="-5dp"
             app:srcCompat="@drawable/gradient_yellow" />
 
+        <Button
+            android:id="@+id/btn_parked"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="132dp"
+            android:layout_marginBottom="-5dp"
+            android:background="@drawable/cancel_btn"
+            android:text="@string/i_ve_parked_here" />
 
     </RelativeLayout>
 

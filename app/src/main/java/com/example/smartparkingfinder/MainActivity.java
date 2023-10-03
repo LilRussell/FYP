@@ -30,14 +30,14 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private BottomNavigationView bottomNavigationView;
-
+    private String UID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        UID= getIntent().getStringExtra("userID");
         // Initialize your bottomNavigationView and set up its listener
         bottomNavigationView = findViewById(R.id.bottomNavMain);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -46,18 +46,29 @@ public class MainActivity extends AppCompatActivity {
                 switch (item.getItemId()) {
                     case R.id.home:
                         // Handle the home tab
-                        loadFragment(new HomeFragment());
+                        HomeFragment homeFragment = new HomeFragment();
+                        Bundle argsH = new Bundle();
+                        argsH.putString("userID", UID);
+                        homeFragment.setArguments(argsH);
+                        loadFragment(homeFragment);
                         // Replace the fragment container with the HomeFragment if needed
                         return true;
                     case R.id.car:
                         // Handle the location tab
-                        loadFragment(new CarRegisterFragment());
-                        // Replace the fragment container with the LocationFragment
-
+                        CarRegisterFragment carfragment = new CarRegisterFragment();
+                        Bundle args = new Bundle();
+                        args.putString("userID", UID); // Pass the UID to the fragment
+                        carfragment.setArguments(args); // Set the arguments
+                        loadFragment(carfragment);
                         return true;
+
                     case R.id.history:
                         // Handle the profile tab
                         loadFragment(new HistoryFragment());
+                        HistoryFragment historyFragment = new HistoryFragment();
+                        Bundle argsHis = new Bundle();
+                        argsHis.putString("userID", UID);
+                        historyFragment.setArguments(argsHis);
                         // Replace the fragment container with the ProfileFragment if needed
                         return true;
                     case R.id.profiles:
@@ -69,9 +80,11 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
-
-        // Load the initial fragment (e.g., HomeFragment)
-        loadFragment(new HomeFragment());
+        HomeFragment homeFragment = new HomeFragment();
+        Bundle argsH = new Bundle();
+        argsH.putString("userID", UID);
+        homeFragment.setArguments(argsH);
+        loadFragment(homeFragment);
 
     }
     private void loadFragment(Fragment fragment) {

@@ -60,7 +60,7 @@
                     android:layout_height="wrap_content"
                     android:autofillHints="emailAddress"
 
-                    android:text="admin1@gmail.com"
+                    android:text="user@gmail.com"
                     android:textColor="@color/black"
                     android:textColorHint="@color/white" />
             </com.google.android.material.textfield.TextInputLayout>

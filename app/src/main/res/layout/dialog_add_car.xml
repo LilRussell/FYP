@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_gravity="center"
+    android:layout_margin="5dp"
+    app:cardCornerRadius="25dp"
+    app:cardBackgroundColor="@color/cardColor"
+    app:cardElevation="3dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="199dp">
+
+
+        <EditText
+            android:id="@+id/editTextNumberplate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="99dp"
+            android:layout_marginTop="35dp"
+            android:ems="10"
+            android:fontFamily="sans-serif-medium"
+            android:inputType="text"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/txt_numberPlate"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+
+
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="35dp"
+            android:layout_marginTop="41dp"
+            android:text="@string/no_plate"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/txt_model"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="45dp"
+            android:layout_marginTop="94dp"
+            android:text="@string/model" />
+
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="-1dp"
+            android:layout_marginBottom="-1dp"
+            android:background="@drawable/cancel_btn"
+            android:text="@string/cancel" />
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="107dp"
+            android:layout_marginBottom="-2dp"
+            android:background="@drawable/cancel_btn"
+            android:text="@string/save" />
+
+        <EditText
+            android:id="@+id/editTextModel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="95dp"
+            android:layout_marginBottom="65dp"
+            android:ems="10"
+            android:fontFamily="sans-serif-medium"
+            android:inputType="text"
+            android:textColor="@color/black"
+
+            />
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>
