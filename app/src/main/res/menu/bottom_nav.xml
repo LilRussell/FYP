@@ -10,7 +10,5 @@
     <item android:title="@string/history"
         android:id="@+id/history"
         android:icon="@drawable/ic_baseline_history_edu_24"/>
-    <item android:title="@string/profiles"
-        android:id="@+id/profiles"
-        android:icon="@drawable/ic_baseline_account_circle_24"/>
+
 </menu>

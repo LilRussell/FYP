@@ -53,8 +53,8 @@ public class UserCardAdapter extends RecyclerView.Adapter<UserCardAdapter.CardVi
 
     public class CardViewHolder extends RecyclerView.ViewHolder {
         private TextView txt_title, txt_traffic;
-        private ImageView img1, img2, img3;
-        private Button btnparked;
+        private ImageView img1, img2, img3,img4;
+
 
         public CardViewHolder(View itemView) {
             super(itemView);
@@ -62,9 +62,10 @@ public class UserCardAdapter extends RecyclerView.Adapter<UserCardAdapter.CardVi
             img1 = itemView.findViewById(R.id.IV_Parking1);
             img2 = itemView.findViewById(R.id.IV_Parking2);
             img3 = itemView.findViewById(R.id.IV_Parking3);
+            img4 = itemView.findViewById(R.id.IV_parked);
             txt_title = itemView.findViewById(R.id.txt_card);
             txt_traffic = itemView.findViewById(R.id.txt_status);
-            btnparked = itemView.findViewById(R.id.btn_parked);
+
         }
 
         public void bind(UserCardItem userCardItem) {
@@ -79,14 +80,13 @@ public class UserCardAdapter extends RecyclerView.Adapter<UserCardAdapter.CardVi
             setImageResourceBasedOnStatusAndCardP(img3, userCardItem.getStatusP3(), userCardItem.getCardP3());
 
             cardTraffic(txt_traffic, userCardItem.getStatusP1(), userCardItem.getStatusP2(), userCardItem.getStatusP3());
-
-            // Set the button click listener
-            btnparked.setOnClickListener(new View.OnClickListener() {
+            img4.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     mUserFragment.btnparkedFunction(userCardItem);
                 }
             });
+
         }
 
         private void cardTraffic(TextView textView, String p1, String p2, String p3) {

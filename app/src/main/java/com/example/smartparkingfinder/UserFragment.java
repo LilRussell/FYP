@@ -13,6 +13,7 @@ import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -319,17 +320,13 @@ public class UserFragment extends Fragment {
     }
     public void btnparkedFunction(UserCardItem cardItem) {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(requireContext(),R.style.CustomAlertDialogTheme));
         builder.setTitle("Confirm Parking");
         builder.setMessage("Do you want to confirm parking at " + cardItem.getCardText() + "?");
 
         builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // Perform the parking confirmation action here
-                // You can update the status of the card or perform other relevant actions
-
-                // 1. Query the "car" node to find a child with userID and value "true"
                 DatabaseReference carRef = FirebaseDatabase.getInstance().getReference().child("car");
                 Query query = carRef.orderByChild("userID").equalTo(userID);
 
@@ -353,6 +350,7 @@ public class UserFragment extends Fragment {
                                     String historyKey = historyRef.push().getKey(); // Generate a unique key
                                     HistoryItem historyItem = new HistoryItem(userID,carNum,cardItem.getCardText(),title,fragmentName,dateTime);
                                     historyRef.child(historyKey).setValue(historyItem);
+
                                 }
 
 
@@ -366,9 +364,6 @@ public class UserFragment extends Fragment {
                     }
                 });
 
-                // Update the card status and notify the adapter if needed
-                // cardItem.setStatusP1("Occupied");
-                // updateStatusInFirebase(cardItem.getCardId(), "statusP1", "Occupied");
             }
         });
 
@@ -381,6 +376,19 @@ public class UserFragment extends Fragment {
         });
 
         AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+
+                // Set text color for positive button
+                positiveButton.setTextColor(getResources().getColor(R.color.black));
+
+                // Set text color for negative button
+                negativeButton.setTextColor(getResources().getColor(R.color.black));
+            }
+        });
         dialog.show();
     }
 }

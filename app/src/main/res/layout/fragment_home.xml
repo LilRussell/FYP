@@ -8,6 +8,20 @@
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/searchView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="top"
+        android:background="@color/cardColor"
+        android:gravity="center"
+        android:elevation="4dp"
+        app:iconifiedByDefault="false"
+        app:queryHint="Search..." />
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,14 +30,16 @@
         android:textSize="20sp"
         android:fontFamily="sans-serif-medium"
         android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
         android:shadowColor="#808080"
         android:shadowDx="8"
+        android:layout_below="@+id/searchView"
         android:shadowDy="4"
         android:shadowRadius="3"
         android:textColor="@color/cardColor"
         />
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/horizontalRecyclerView_Main"
+        android:id="@+id/recent_rv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/recentitemtxt"
@@ -38,7 +54,7 @@
         android:id="@+id/allitemtxt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/horizontalRecyclerView_Main"
+        android:layout_below="@+id/recent_rv"
         android:layout_marginLeft="20dp"
         android:fontFamily="sans-serif-medium"
         android:text="@string/all_parking_location"

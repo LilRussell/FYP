@@ -4,6 +4,7 @@ import static androidx.core.content.ContentProviderCompat.requireContext;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -13,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -47,6 +49,7 @@ public class User_Parking_Location extends AppCompatActivity {
 
         locationId = getIntent().getStringExtra("locationId");
         locationName = getIntent().getStringExtra("locationName").toUpperCase(Locale.ROOT);
+
         userID = getIntent().getStringExtra("userID");
 
         Log.d("title",locationName);
@@ -80,7 +83,6 @@ public class User_Parking_Location extends AppCompatActivity {
         args.putString("locationName",locationName);
         args.putString("fragmentName", tabTitle);
         args.putString("userID",userID);
-        Log.d("passID",userID);
         fragment.setArguments(args);
 
         // Add the fragment to the adapter and notify the adapter of the data set change

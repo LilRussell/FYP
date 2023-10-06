@@ -11,18 +11,5 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <Button
-        android:id="@+id/get_emptyCard"
-        android:layout_width="69dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="21dp"
-        android:layout_marginBottom="32dp"
-        android:gravity="center"
-        android:text="@string/add_location"
-
-        />
-
 
 </RelativeLayout>

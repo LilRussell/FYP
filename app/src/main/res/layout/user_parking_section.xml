@@ -15,23 +15,37 @@
         android:layout_height="235dp">
 
         <ImageView
-            android:id="@+id/IV_Parking1"
-            android:layout_width="106dp"
-            android:layout_height="131dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="60dp"
-            app:srcCompat="@drawable/image_na" />
-
-        <ImageView
             android:id="@+id/IV_Parking2"
             android:layout_width="106dp"
             android:layout_height="131dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginStart="142dp"
-            android:layout_marginTop="60dp"
+            android:layout_marginStart="145dp"
+            android:layout_marginTop="78dp"
+            app:srcCompat="@drawable/image_na" />
+
+        <ImageView
+            android:id="@+id/IV_parked"
+            android:layout_width="45dp"
+            android:layout_height="36dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="363dp"
+            android:layout_marginBottom="153dp"
+            android:background="@drawable/gradient_blue"
+            android:elevation="15dp"
+            android:adjustViewBounds="true"
+            android:src="@drawable/icons8_parking_ticket_96" />
+
+        <ImageView
+            android:id="@+id/IV_Parking1"
+            android:layout_width="106dp"
+            android:layout_height="131dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="78dp"
+
             app:srcCompat="@drawable/image_na" />
 
         <ImageView
@@ -40,20 +54,30 @@
             android:layout_height="131dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginStart="270dp"
-            android:layout_marginTop="60dp"
+            android:layout_marginStart="273dp"
+            android:layout_marginTop="78dp"
             app:srcCompat="@drawable/image_na" />
 
 
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:layout_alignParentTop="true"
+
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="0dp"
+            android:background="@drawable/gradient_brown" />
+
         <TextView
             android:id="@+id/txt_card"
-            android:layout_width="124dp"
-            android:layout_height="48dp"
+            android:layout_width="198dp"
+            android:layout_height="46dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_marginStart="0dp"
-            android:layout_marginTop="0dp"
-            android:background="@drawable/gradient_brown"
+            android:layout_marginTop="2dp"
+
             android:fontFamily="sans-serif-medium"
             android:paddingLeft="15dp"
             android:paddingTop="8dp"
@@ -61,7 +85,6 @@
             android:shadowDx="2"
             android:shadowDy="4"
             android:shadowRadius="3"
-
             android:text="TextView"
             android:textSize="20sp" />
 
@@ -84,27 +107,6 @@
             android:shadowRadius="3"
             android:text="TextView"
             android:textSize="20sp" />
-
-        <ImageView
-            android:id="@+id/IV_bottomline"
-            android:layout_width="250dp"
-            android:layout_height="15dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="79dp"
-            android:layout_marginBottom="-5dp"
-            app:srcCompat="@drawable/gradient_yellow" />
-
-        <Button
-            android:id="@+id/btn_parked"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginEnd="132dp"
-            android:layout_marginBottom="-5dp"
-            android:background="@drawable/cancel_btn"
-            android:text="@string/i_ve_parked_here" />
 
     </RelativeLayout>
 
