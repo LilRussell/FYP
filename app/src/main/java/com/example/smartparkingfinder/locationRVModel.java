@@ -4,18 +4,18 @@ public class locationRVModel {
     private String id;
     private String name;
     private String description;
-    private int parkingNumber; // Add a new field for parking number
+    private int parkingAvailability; // Add a new field for parking number
     private String imageURL; // Add a field for image URL
 
     public locationRVModel() {
         // Default constructor required for Firebase
     }
 
-    public locationRVModel(String id, String name, String description,int parkingNumber, String imageURL) {
+    public locationRVModel(String id, String name, String description,int parkingAvailability, String imageURL) {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.parkingNumber = parkingNumber;
+        this.parkingAvailability = parkingAvailability;
         this.imageURL = imageURL;
     }
 
@@ -31,7 +31,7 @@ public class locationRVModel {
         return description;
     }
     public int getParkingNumber() {
-        return parkingNumber;
+        return parkingAvailability;
     }
 
     public String getImageURL() {
@@ -43,6 +43,6 @@ public class locationRVModel {
     }
     // Getter method for parking availability
     public int getParkingAvailability() {
-        return parkingNumber; // Assuming parkingNumber represents parking availability
+        return parkingAvailability; // Assuming parkingNumber represents parking availability
     }
 }

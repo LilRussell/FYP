@@ -66,12 +66,8 @@ public class TestFragment extends Fragment {
         // Set up the RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(adapter);
-        Bundle args = getArguments();
-        if (args != null) {
-            adminId = args.getString("adminIdKey");
-
-        }
-
+        adminId= UserData.getInstance().getUserID();
+        Log.d("adminID",adminId);
         for (CardItem cardItem : cardItemList) {
             Log.d("CardItemID", "Card ID: " + cardItem.getCardId());
         }
@@ -313,8 +309,10 @@ public class TestFragment extends Fragment {
 
 
     void showCameraListDialog(String cardId) {
-        currentCardId = cardId;
 
+        currentCardId = cardId;
+        String cameraAdmin = adminId;
+        Log.d("adminID",adminId);
         // Inflate the custom layout for the AlertDialog
         View customLayout = getLayoutInflater().inflate(R.layout.select_camera, null);
 
@@ -355,13 +353,13 @@ public class TestFragment extends Fragment {
                 // Loop through the query results
                 for (DataSnapshot cameraSnapshot : dataSnapshot.getChildren()) {
                     // Assuming "name" is the field that contains the camera name
-                    if(cameraSnapshot.child("ownedBy").getValue(String.class).equals(adminId)&&cameraSnapshot.child("assignedLocation").getValue(String.class).equals("None")){
+                    if(cameraSnapshot.child("ownedBy").getValue(String.class).equals(cameraAdmin)&&cameraSnapshot.child("assignedLocation").getValue(String.class).equals("None")){
                         String cameraName = cameraSnapshot.child("id").getValue(String.class);
 
                         if (cameraName != null) {
                             Log.d("CameraListID",cameraName);
                             cameraNames.add(cameraName);
-                            RadioButton radioButton = new RadioButton(requireContext());
+                            RadioButton radioButton = new RadioButton(requireActivity());
                             radioButton.setText(cameraName);
                             cameraListRadioGroup.addView(radioButton);
                         }

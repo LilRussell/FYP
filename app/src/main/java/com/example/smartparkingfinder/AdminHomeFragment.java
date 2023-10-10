@@ -216,7 +216,7 @@ public class AdminHomeFragment extends Fragment {
 
         locationTextView.setText(item.getName());
         descriptionTextView.setText(item.getDescription());
-        parkingTextView.setText("Parking Availability: " + item.getParkingAvailability());
+        parkingTextView.setText("Parking Available: " + item.getParkingAvailability());
 
         // Load and display the image using Glide or a similar image loading library
         Glide.with(this)

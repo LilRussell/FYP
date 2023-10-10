@@ -53,12 +53,12 @@ public class AddLocation extends AppCompatActivity {
                 // Get the values from the EditText fields
                 String locationName = ((EditText) findViewById(R.id.edt_location_name)).getText().toString();
                 String locationDescription = ((EditText) findViewById(R.id.edt_location_desc)).getText().toString();
-                String parkingSpace = ((EditText) findViewById(R.id.edt_parking_space)).getText().toString();
+
 
                 // Check if an image is selected
                 if (filePath != null) {
                     // Upload the image to Firebase Storage
-                    uploadImage(locationName, locationDescription, parkingSpace);
+                    uploadImage(locationName, locationDescription);
                 } else {
                     Toast.makeText(getApplicationContext(), "Please select an image", Toast.LENGTH_SHORT).show();
                 }
@@ -96,7 +96,7 @@ public class AddLocation extends AppCompatActivity {
         }
     }
 
-    private void uploadImage(String locationName, String locationDescription, String parkingSpace) {
+    private void uploadImage(String locationName, String locationDescription) {
         if (filePath != null) {
             // Create a unique ID for the location
             String locationId = mDatabase.child("location").push().getKey();
@@ -114,7 +114,7 @@ public class AddLocation extends AppCompatActivity {
                         imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
 
                             // Create a Location object with name, description, parking number, and image URL
-                            locationRVModel location = new locationRVModel(locationId, locationName, locationDescription, Integer.parseInt(parkingSpace), uri.toString());
+                            locationRVModel location = new locationRVModel(locationId, locationName, locationDescription, 0, uri.toString());
 
                             // Save the location to Firebase Realtime Database under "location/id/details"
                             locationRef.setValue(location);
@@ -122,7 +122,6 @@ public class AddLocation extends AppCompatActivity {
                             // Clear the EditText fields after saving
                             ((EditText) findViewById(R.id.edt_location_name)).setText("");
                             ((EditText) findViewById(R.id.edt_location_desc)).setText("");
-                            ((EditText) findViewById(R.id.edt_parking_space)).setText("");
 
                             Toast.makeText(getApplicationContext(), "Location and Image saved!", Toast.LENGTH_SHORT).show();
                         });

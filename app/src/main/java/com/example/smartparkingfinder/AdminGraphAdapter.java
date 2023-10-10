@@ -72,7 +72,12 @@ public class AdminGraphAdapter extends RecyclerView.Adapter<AdminGraphAdapter.Vi
 
         // Create a LineData object with the dataSet
         LineData lineData = new LineData(dataSet);
-
+        lineChart.setDrawBorders(true);
+        lineChart.setBorderWidth(1f);
+        lineChart.getAxisLeft().setAxisMinimum(0f); // Set the minimum value on the left Y-axis to 0
+        lineChart.getAxisRight().setEnabled(false); // Disable the right Y-axis
+        lineChart.getXAxis().setDrawAxisLine(true);
+        lineChart.getXAxis().setDrawGridLines(false);
         // Set the LineData to the LineChart
         lineChart.setData(lineData);
 
