@@ -102,7 +102,7 @@
             android:layout_alignParentEnd="true"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="100dp"
-            app:srcCompat="@drawable/ic_baseline_linked_camera_24" />
+            app:srcCompat="@drawable/baseline_linked_camera_section_24" />
 
         <TextView
             android:id="@+id/txt_camera"

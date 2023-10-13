@@ -65,6 +65,7 @@ public class TestingTab extends AppCompatActivity {
         deleteTabButton = findViewById(R.id.deleteTabButton);
         // Load tab data and cards for each tab from Firebase
         loadTabsAndCardsFromFirebase(locationRef);
+
         addTabButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -111,7 +112,7 @@ public class TestingTab extends AppCompatActivity {
                 builder.show();
             }
         });
-         addCardButton.setOnClickListener(new View.OnClickListener() {
+        addCardButton.setOnClickListener(new View.OnClickListener() {
             private int cardCounter = 1; // Initialize a counter
 
             @Override
@@ -119,13 +120,19 @@ public class TestingTab extends AppCompatActivity {
                 int currentItem = viewPager.getCurrentItem();
                 Fragment currentFragment = adapter.getItem(currentItem);
 
-                if (currentFragment instanceof TestFragment) {
-                    // Get the TabInfo object for the currently selected tab
-                    TabInfo selectedTabInfo = tabInfoList.get(currentItem);
-                    cardCounter++;
-                    // Save the new card to Firebase using the tab ID from TabInfo
-                    saveCardToFirebase(locationRef, selectedTabInfo.getId(),cardCounter,currentFragment);
-                    Log.d("Database", "Saved Card");
+                // Check if there are tabs added
+
+                    if (currentFragment instanceof TestFragment) {
+
+                            // Get the TabInfo object for the currently selected tab
+                            TabInfo selectedTabInfo = tabInfoList.get(currentItem);
+                            cardCounter++;
+                            // Save the new card to Firebase using the tab ID from TabInfo
+                            saveCardToFirebase(locationRef, selectedTabInfo.getId(), cardCounter, currentFragment);
+                            Log.d("Database", "Saved Card");
+                }
+            else {
+                    Toast.makeText(TestingTab.this, "No tabs added yet. Please add a tab first.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -137,6 +144,8 @@ public class TestingTab extends AppCompatActivity {
 
             }
         });
+
+
     }
     private void deleteTabAndUpdateViewPager(int position) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -163,6 +172,11 @@ public class TestingTab extends AppCompatActivity {
                         adapter.clearFragments();
                         tabInfoList.clear();
                         tabCount--; // Decrement the fragment count
+                        if (tabCount==0) {
+                            addCardButton.setVisibility(View.GONE);
+                        } else {
+                            addCardButton.setVisibility(View.VISIBLE);
+                        }
                         viewPager.setOffscreenPageLimit(tabCount);
                         adapter = new TestTabAdapter(getSupportFragmentManager());
                         viewPager.setAdapter(adapter);
@@ -201,32 +215,10 @@ public class TestingTab extends AppCompatActivity {
             }
         } else {
             // Handle the case where currentItem is out of bounds
+
             Toast.makeText(TestingTab.this, "Invalid tab index.", Toast.LENGTH_SHORT).show();
         }
-    }private void removeTabFromList(int position) {
-        if (position >= 0 && position < tabInfoList.size()) {
-            // Remove the tab from the TabLayout
-            TabLayout.Tab tabToRemove = tabLayout.getTabAt(position);
-            if (tabToRemove != null) {
-                tabLayout.removeTab(tabToRemove);
-            }
-
-            // Remove the fragment associated with the deleted tab from the adapter
-            adapter.removeFragment(position);
-
-            // Remove the item from the tabInfoList
-            tabInfoList.remove(position);
-
-            // Shift the positions of remaining tabs in tabInfoList to maintain order
-            for (int i = position; i < tabInfoList.size(); i++) {
-                tabInfoList.get(i).setPosition(i);
-            }
-
-            // Notify the adapter that the data set has changed
-            adapter.notifyDataSetChanged();
-        }
     }
-
 
     private void deleteTabFromFirebase(DatabaseReference locationRef, String tabId) {
         // Remove the tab node using its unique ID
@@ -279,6 +271,11 @@ public class TestingTab extends AppCompatActivity {
         adapter.addFragment(fragment, tabTitle);
         fragments.add(fragment);
         adapter.notifyDataSetChanged();
+        if (tabCount==0) {
+            addCardButton.setVisibility(View.GONE);
+        }else {
+            addCardButton.setVisibility(View.VISIBLE);
+        }
     }
 
     private void addNewTab(int Count,String title) {
@@ -291,7 +288,11 @@ public class TestingTab extends AppCompatActivity {
         fragments.add(fragment);
         // Notify the adapter that the data set has changed
         adapter.notifyDataSetChanged();
-
+        if (Count!=0) {
+            addCardButton.setVisibility(View.GONE);
+        }else {
+            addCardButton.setVisibility(View.VISIBLE);
+        }
 
     }
 
@@ -372,6 +373,11 @@ public class TestingTab extends AppCompatActivity {
                     }
                 }
                 viewPager.setOffscreenPageLimit(tabCount);
+                if (tabCount==0) {
+                    addCardButton.setVisibility(View.GONE);
+                } else {
+                    addCardButton.setVisibility(View.VISIBLE);
+                }
             }
 
             @Override
@@ -379,6 +385,7 @@ public class TestingTab extends AppCompatActivity {
                 // Handle error
             }
         });
+
     }
 
     private void loadCardDataFromFirebase(DatabaseReference locationRef,String tabID, String tabTitle) {

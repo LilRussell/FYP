@@ -55,5 +55,6 @@
     <string name="register_car">Register Car</string>
     <string name="statistic">Statistic</string>
     <string name="camera">Camera</string>
+    <string name="cameraListName">Camera :</string>
 
 </resources>
