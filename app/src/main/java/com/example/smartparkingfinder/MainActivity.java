@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-       // UID= getIntent().getStringExtra("userID");
         mAuth = FirebaseAuth.getInstance();
         UID= UserData.getInstance().getUserID();
         HomeFragment homeFragment = new HomeFragment();

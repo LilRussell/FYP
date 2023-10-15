@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="@string/admin_list"
+        android:id="@+id/admin_list"
+        android:icon="@drawable/ic_baseline_groups_24" />
+    <item android:title="@string/pending_location"
+        android:id="@+id/pending"
+        android:icon="@drawable/ic_baseline_pending_actions_24"/>
+    <item android:title="@string/approved_location"
+        android:id="@+id/approved"
+        android:icon="@drawable/ic_baseline_location_city_24"/>
+
+</menu>

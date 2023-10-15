@@ -56,5 +56,9 @@
     <string name="statistic">Statistic</string>
     <string name="camera">Camera</string>
     <string name="cameraListName">Camera :</string>
+    <string name="approved_location">Approved Location</string>
+    <string name="pending_location">Pending Location</string>
+    <string name="admin_list">Admin List</string>
+    <string name="upload_image">Upload Image</string>
 
 </resources>

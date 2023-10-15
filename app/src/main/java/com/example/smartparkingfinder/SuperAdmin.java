@@ -1,8 +1,11 @@
 package com.example.smartparkingfinder;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,47 +18,64 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class SuperAdmin extends AppCompatActivity {
-
-    private Button btn_register;
     private Toolbar toolbar;
     private FirebaseAuth mAuth;
+    private String UID;
+    private BottomNavigationView bottomNavingationView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_super_admin);
-        btn_register=findViewById(R.id.btn_register_camera);
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         mAuth = FirebaseAuth.getInstance();
-        btn_register.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            showInputDialog();
-        }
-    });
+        UID= UserData.getInstance().getUserID();
+        SuperAdminGroupFragment superAdminGroupFragment = new SuperAdminGroupFragment();
+        loadFragment(superAdminGroupFragment);
+        bottomNavingationView = findViewById(R.id.bottomNavMain_superAdmin);
+        bottomNavingationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.admin_list:
+                        SuperAdminGroupFragment superAdminGroupFragment = new SuperAdminGroupFragment();
+                        loadFragment(superAdminGroupFragment);
 
+                        return true;
+                    case R.id.pending:
+                        SuoerAdminPendingFragment suoerAdminPendingFragment = new SuoerAdminPendingFragment();
+                        loadFragment(suoerAdminPendingFragment);
+
+                        return true;
+                    case R.id.approved:
+                        SuperAdminApprovedFragment superAdminApprovedFragment = new SuperAdminApprovedFragment();
+                        loadFragment(superAdminApprovedFragment);
+
+                        return true;
+                }
+                return false;
+            }
+        });
 
 
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater=getMenuInflater();
-        inflater.inflate(R.menu.toolbar_menu,menu);
+        inflater.inflate(R.menu.superadmin_toolbar,menu);
         return true;
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.settings) {
-
-            return true;
-        } else if (id == R.id.add_camera) {
+       if (id == R.id.tb_register_camera) {
             showInputDialog();
             return true;
         }else if (id==R.id.tb_logout){
@@ -131,6 +151,12 @@ public class SuperAdmin extends AppCompatActivity {
 
         // Make sure to finish the current activity to prevent the user from navigating back to it.
         finish();
+    }
+    private void loadFragment(Fragment fragment) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container_superAdmin, fragment);
+        transaction.addToBackStack(null); // Optional, to add fragments to the back stack
+        transaction.commit();
     }
 
 }
