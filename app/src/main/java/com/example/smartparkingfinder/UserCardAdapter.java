@@ -38,6 +38,16 @@ public class UserCardAdapter extends RecyclerView.Adapter<UserCardAdapter.CardVi
     public void onBindViewHolder(@NonNull CardViewHolder holder, int position) {
         UserCardItem userCardItem = cardItemList.get(position);
         holder.bind(userCardItem);
+        String currentCardId = userCardItem.getCardId();
+        TextView previewImgTxt = holder.itemView.findViewById(R.id.previewImageTxt);
+        previewImgTxt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mUserFragment.showImageFromFirebase(currentCardId);
+            }
+        });
+
+
     }
 
     public void scrollToPosition(int position) {
@@ -69,6 +79,7 @@ public class UserCardAdapter extends RecyclerView.Adapter<UserCardAdapter.CardVi
         }
 
         public void bind(UserCardItem userCardItem) {
+
             txt_title.setText(userCardItem.getCardText());
 
             setImageResourceBasedOnCardP(img1, userCardItem.getCardP1());

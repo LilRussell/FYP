@@ -18,9 +18,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import org.w3c.dom.Text;
+
 import java.util.List;
 public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder> {
-
+    private String currentCardId; // Current card ID
     private List<CardItem> cardItemList;
     private List<String> cameraNames; // Add a field for camera names
     private Context context;
@@ -57,6 +60,8 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
         ImageView editTitleImageView = holder.itemView.findViewById(R.id.edit_IV_Title); // Replace with your ImageView ID
         ImageView editCameraImageView = holder.itemView.findViewById(R.id.edit_IV_Camera);
         ImageView deleteCardImageView = holder.itemView.findViewById(R.id.IV_Delete);
+        TextView uploadImgTxt = holder.itemView.findViewById(R.id.uploadImageTxt);
+        TextView previewImageTxt = holder.itemView.findViewById(R.id.previewImageTxt);
         editTitleImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -107,6 +112,19 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
                 }
             }
         });
+        uploadImgTxt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                testFragment.chooseImage(currentCardId);
+
+            }
+        });
+        previewImageTxt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                testFragment.showImageFromFirebase(currentCardId);
+            }
+        });
 
     }
 
@@ -116,7 +134,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
     }
 
     public class CardViewHolder extends RecyclerView.ViewHolder {
-        private TextView txt_title,txt_camera;
+        private TextView txt_title,txt_camera,uplaodImgTxt,previewImgTxt;
         private ImageView img1,img2,img3;
         private Button btn1,btn2,btn3;
 
@@ -128,6 +146,8 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
             img3 = itemView.findViewById(R.id.IV_Parking3);
             txt_title = itemView.findViewById(R.id.txt_card);
             txt_camera = itemView.findViewById(R.id.txt_camera);
+            uplaodImgTxt = itemView.findViewById(R.id.uploadImageTxt);
+            previewImgTxt = itemView.findViewById(R.id.previewImageTxt);
             btn1=itemView.findViewById(R.id.btn_chg_parking1);
             btn2=itemView.findViewById(R.id.btn_chg_parking2);
             btn3=itemView.findViewById(R.id.btn_chg_parking3);
@@ -152,6 +172,24 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
 
 
 
+        }
+    }
+
+
+    // Constructor and other methods in your CardAdapter
+
+    public void setCurrentCardId(String cardId) {
+        currentCardId = cardId;
+    }
+
+    public void setImageUrlForCurrentCard(String imageUrl) {
+        // Find the selected CardItem and set its imageUrl
+        for (CardItem cardItem : cardItemList) {
+            if (cardItem.getCardId().equals(currentCardId)) {
+                cardItem.setImageUrl(imageUrl);
+                notifyDataSetChanged(); // Refresh the RecyclerView
+                break; // Break the loop once the selected card is found
+            }
         }
     }
     private void DisableButton(Button button,TextView textView,String camera){

@@ -60,5 +60,9 @@
     <string name="pending_location">Pending Location</string>
     <string name="admin_list">Admin List</string>
     <string name="upload_image">Upload Image</string>
+    <string name="save_details">Save Details</string>
+    <string name="upload_parking_floor_plan_for_easier_navigation"><u>Upload Parking Floor Plan For Easier Navigation</u></string>
+    <string name="preview_and_save_images"><u>Preview and Save Images</u></string>
+    <string name="more_info"><u>More Info.</u></string>
 
 </resources>

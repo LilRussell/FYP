@@ -12,10 +12,9 @@
     app:cardElevation="3dp">
 
     <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="312dp"
         android:id="@+id/RL_card"
-        >
+        android:layout_width="407dp"
+        android:layout_height="330dp">
 
         <TextView
             android:id="@+id/txt_card2"
@@ -68,23 +67,13 @@
             app:srcCompat="@drawable/image_na" />
 
         <Button
-            android:id="@+id/btn_chg_parking3"
-            android:layout_width="wrap_content"
-            android:layout_height="46dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="278dp"
-            android:layout_marginBottom="53dp"
-            android:text="@string/edit" />
-
-        <Button
             android:id="@+id/btn_chg_parking2"
             android:layout_width="wrap_content"
             android:layout_height="46dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginStart="147dp"
-            android:layout_marginBottom="53dp"
+            android:layout_marginStart="148dp"
+            android:layout_marginBottom="64dp"
             android:text="@string/edit" />
 
         <Button
@@ -93,8 +82,46 @@
             android:layout_height="46dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginStart="26dp"
-            android:layout_marginBottom="53dp"
+            android:layout_marginStart="27dp"
+            android:layout_marginBottom="64dp"
+            android:text="@string/edit" />
+
+        <TextView
+            android:id="@+id/uploadImageTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="45dp"
+            android:layout_marginBottom="37dp"
+            android:autoLink="all"
+            android:linksClickable="false"
+            android:selectAllOnFocus="false"
+            android:textColor="@color/custom_blue"
+            android:text="@string/upload_parking_floor_plan_for_easier_navigation" />
+
+        <TextView
+            android:id="@+id/previewImageTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="123dp"
+            android:layout_marginBottom="9dp"
+            android:autoLink="all"
+            android:linksClickable="false"
+            android:selectAllOnFocus="false"
+            android:textColor="@color/custom_blue"
+            android:text="@string/preview_and_save_images" />
+
+        <Button
+            android:id="@+id/btn_chg_parking3"
+            android:layout_width="wrap_content"
+            android:layout_height="46dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="279dp"
+            android:layout_marginBottom="64dp"
             android:text="@string/edit" />
 
         <TextView

@@ -10,6 +10,7 @@ public class CardItem {
     private String statusP1;
     private String statusP2;
     private String statusP3;
+    private String imageUrl;
     public CardItem(String cardId, String cardText) {
         this.cardId = cardId;
         this.cardText = cardText;
@@ -84,6 +85,9 @@ public class CardItem {
     public void setStatusP3(String statusP3){
         this.statusP3=statusP3;
     }
-
+    public String getImageUrl() {
+        return imageUrl;
+    }
+    public void setImageUrl(String imageUrl){this.imageUrl=imageUrl;}
 
 }

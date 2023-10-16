@@ -30,9 +30,6 @@ public class locationRVModel {
     public String getDescription() {
         return description;
     }
-    public int getParkingNumber() {
-        return parkingAvailability;
-    }
 
     public String getImageURL() {
         return imageURL;

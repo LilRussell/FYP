@@ -1,8 +1,14 @@
 package com.example.smartparkingfinder;
 
+import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
@@ -31,10 +37,16 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 public class TestFragment extends Fragment {
 
@@ -48,6 +60,9 @@ public class TestFragment extends Fragment {
     private String adminId;
     private DatabaseReference cameraRef,camerasRef;
     private ValueEventListener cameraListener;
+    private Uri filePath; // To store the selected image URI
+    private static final int PICK_IMAGE_REQUEST = 71; // Request code for image selection
+    private StorageReference storageReference;
     public TestFragment() {
         // Required empty public constructor
     }
@@ -67,10 +82,6 @@ public class TestFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(adapter);
         adminId= UserData.getInstance().getUserID();
-        Log.d("adminID",adminId);
-        for (CardItem cardItem : cardItemList) {
-            Log.d("CardItemID", "Card ID: " + cardItem.getCardId());
-        }
         // Firebase reference to the "camera" node
         cameraRef = FirebaseDatabase.getInstance().getReference().child("camera");
 
@@ -153,6 +164,156 @@ public class TestFragment extends Fragment {
         return view;
 
 
+
+    }
+    public void chooseImage(String cardId) {
+        currentCardId = cardId;
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("image/*");
+        startActivityForResult(Intent.createChooser(intent, "Select Image"), PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
+            filePath = data.getData();
+
+            try {
+                // Load the selected image into the ImageView (if needed)
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(), filePath);
+                InputStream inputStream = requireActivity().getContentResolver().openInputStream(filePath);
+                showImagePreview(inputStream);
+                uploadImageToFirebase(filePath,currentCardId);
+                for (CardItem cardItem : cardItemList) {
+                    if (cardItem.getCardId().equals(currentCardId)) {
+                        cardItem.setImageUrl(filePath.toString());
+                        break; // Break the loop once the selected card is found
+                    }
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    public void showImagePreview(InputStream inputStream) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Image Preview");
+
+        // Create an ImageView to display the image
+        ImageView imageView = new ImageView(requireContext());
+        imageView.setImageBitmap(BitmapFactory.decodeStream(inputStream));
+
+        // Add the ImageView to the dialog's layout
+        builder.setView(imageView);
+
+        // Add a "Close" button to dismiss the dialog
+        builder.setNegativeButton("Close", (dialog, which) -> dialog.dismiss());
+
+        // Create and show the AlertDialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+    public void showImageFromFirebase(String cardId) {
+        Bundle args = getArguments(); // Retrieve fragment's arguments
+        if (args != null) {
+            String locationId = args.getString("locationId");
+            String tabTitle = args.getString("tabTitle");
+
+            if (locationId != null && tabTitle != null) {
+                DatabaseReference cardRef = FirebaseDatabase.getInstance().getReference()
+                        .child("location")
+                        .child(locationId)
+                        .child("details")
+                        .child("layout")
+                        .child(tabTitle)
+                        .child("card")
+                        .child(cardId);
+
+                cardRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            String imageUrl = dataSnapshot.child("ImageUrl").getValue(String.class);
+
+                            if (imageUrl != null) {
+                                // Create an alert dialog
+                                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+                                builder.setTitle("Image Preview");
+
+                                // Create an ImageView to display the image
+                                ImageView imageView = new ImageView(requireContext());
+
+                                // Load the image into the ImageView using Picasso or any other image loading library
+                                Picasso.get().load(imageUrl).into(imageView);
+
+                                // Add the ImageView to the dialog's layout
+                                builder.setView(imageView);
+
+                                // Add a "Close" button to dismiss the dialog
+                                builder.setNegativeButton("Close", (dialog, which) -> dialog.dismiss());
+
+                                // Create and show the AlertDialog
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+                            } else {
+                                // Handle the case where imageUrl is null (no image available for this card)
+                                // You can show a message to the user or take other appropriate actions.
+                            }
+                        } else {
+                            // Handle the case where the cardId doesn't exist in the database
+                            // You can show an error message or take other appropriate actions.
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        // Handle any errors here
+                    }
+                });
+            }
+        }
+    }
+    private void uploadImageToFirebase(Uri filePath, String cardId) {
+        if (filePath != null) {
+            Bundle args = getArguments(); // Retrieve fragment's arguments
+            if (args != null) {
+                String locationId = args.getString("locationId");
+                String tabTitle = args.getString("tabTitle");
+
+                if (locationId != null && tabTitle != null) {
+                    // Get a reference to the Firebase Storage location where you want to upload the image
+                    storageReference = FirebaseStorage.getInstance().getReference("card_images");
+                    StorageReference imageRef = storageReference.child(cardId + ".jpg");
+                    DatabaseReference cardRef = FirebaseDatabase.getInstance().getReference()
+                            .child("location")
+                            .child(locationId)
+                            .child("details")
+                            .child("layout")
+                            .child(tabTitle)
+                            .child("card")
+                            .child(cardId);
+
+                    // Upload the image to Firebase Storage
+                    imageRef.putFile(filePath)
+                            .addOnSuccessListener(taskSnapshot -> {
+                                // Image uploaded successfully
+                                // You can get the download URL of the uploaded image
+                                imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                                    String downloadUrl = uri.toString();
+                                     cardRef.child("ImageUrl").setValue(downloadUrl);
+
+                                });
+                            })
+                            .addOnFailureListener(e -> {
+                                // Handle any errors that occurred during the upload
+                                Toast.makeText(requireContext(), "Image upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
+                }
+                }
+            }
 
     }
     @Override

@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
-<TextView
+
+    <TextView
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/txt_parking_count"
@@ -14,22 +15,84 @@
     android:textColor="@color/black"
     android:gravity="center"
     />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/RV_parking"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/txt_parking_count"/>
+        android:layout_height="649dp"
+        android:layout_below="@id/txt_parking_count" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="-6dp"
+        app:srcCompat="@drawable/gradient_brown" />
 
     <Button
         android:id="@+id/btn_findCard"
-        android:layout_width="69dp"
-        android:layout_height="wrap_content"
+        android:layout_width="56dp"
+        android:layout_height="44dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginEnd="21dp"
-        android:layout_marginBottom="32dp"
-        android:gravity="center"
-        android:text="@string/add_location" />
+        android:layout_marginEnd="324dp"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/search"
+        android:gravity="center" />
+
+    <Button
+        android:id="@+id/btn_findNormalCard"
+        android:layout_width="61dp"
+        android:layout_height="42dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="174dp"
+        android:layout_marginBottom="19dp"
+        android:background="@drawable/electric"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/btn_findNormalCard"
+        android:layout_alignBottom="@+id/btn_findNormalCard"
+        android:layout_marginEnd="-15dp"
+        android:layout_marginBottom="-18dp"
+        android:text="Normal Parking" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/btn_findNormalCard"
+        android:layout_alignBottom="@+id/btn_findNormalCard"
+        android:layout_marginEnd="150dp"
+        android:layout_marginBottom="-18dp"
+        android:text="Quick Find" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/btn_findNormalCard"
+        android:layout_alignBottom="@+id/btn_findNormalCard"
+        android:layout_marginEnd="-172dp"
+        android:layout_marginBottom="-17dp"
+        android:text="Disabled Parking" />
+
+    <Button
+        android:id="@+id/btn_findDisabledCard"
+        android:layout_width="43dp"
+        android:layout_height="45dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="44dp"
+        android:layout_marginBottom="18dp"
+        android:background="@drawable/disabled"
+
+        android:gravity="center" />
 
 
 </RelativeLayout>

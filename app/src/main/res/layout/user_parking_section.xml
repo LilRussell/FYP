@@ -108,6 +108,21 @@
             android:text="TextView"
             android:textSize="20sp" />
 
+        <TextView
+            android:id="@+id/previewImageTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="166dp"
+            android:layout_marginBottom="2dp"
+            android:autoLink="all"
+            android:linksClickable="false"
+            android:selectAllOnFocus="false"
+            android:text="@string/more_info"
+            android:textColor="@color/custom_blue" />
+
+
     </RelativeLayout>
 
 </androidx.cardview.widget.CardView>
