@@ -73,43 +73,43 @@ public class AdminCameraFragment extends Fragment {
                             @Override
                             public void onDataChange(DataSnapshot locationSnapshot) {
                                 String locationName = locationSnapshot.child("details").child("name").getValue(String.class);
+                                    tabRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot tabSnapshot) {
+                                            String tabName = tabSnapshot.child("name").getValue(String.class);
 
-                                tabRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot tabSnapshot) {
-                                        String tabName = tabSnapshot.child("name").getValue(String.class);
+                                            cardRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(DataSnapshot cardSnapshot) {
+                                                    cameraList.clear();
+                                                    String cardName = cardSnapshot.child("cardText").getValue(String.class);
 
-                                        cardRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(DataSnapshot cardSnapshot) {
-                                                cameraList.clear();
-                                                String cardName = cardSnapshot.child("cardText").getValue(String.class);
-
-                                                // Create a CameraModel with the retrieved data
-                                                CameraModel cameraModel = new CameraModel(cameraName, locationName, tabName, cardName, status, userID);
-                                                newItems.add(0, cameraModel);
-                                                // Add the new items to the top of the list
-                                                cameraList.addAll(0, newItems);
-                                                // Notify the adapter that the data has changed
-                                                cameraAdapter.notifyDataSetChanged();
-
-
-                                            }
+                                                    // Create a CameraModel with the retrieved data
+                                                    CameraModel cameraModel = new CameraModel(cameraName, locationName, tabName, cardName, status, userID);
+                                                    newItems.add(0, cameraModel);
+                                                    // Add the new items to the top of the list
+                                                    cameraList.addAll(0, newItems);
+                                                    // Notify the adapter that the data has changed
+                                                    cameraAdapter.notifyDataSetChanged();
 
 
-                                            @Override
-                                            public void onCancelled(DatabaseError cardDatabaseError) {
-                                                // Handle errors here
-                                            }
-                                        });
-                                    }
+                                                }
 
-                                    @Override
-                                    public void onCancelled(DatabaseError tabDatabaseError) {
-                                        // Handle errors here
-                                    }
-                                });
-                            }
+
+                                                @Override
+                                                public void onCancelled(DatabaseError cardDatabaseError) {
+                                                    // Handle errors here
+                                                }
+                                            });
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError tabDatabaseError) {
+                                            // Handle errors here
+                                        }
+                                    });
+                                }
+
                             @Override
                             public void onCancelled(DatabaseError tabDatabaseError) {
                                 // Handle errors here
@@ -117,6 +117,7 @@ public class AdminCameraFragment extends Fragment {
                         });
                     }
                 }
+
 
 
             }

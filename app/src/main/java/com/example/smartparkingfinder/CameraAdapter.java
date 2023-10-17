@@ -28,7 +28,16 @@ public class CameraAdapter extends RecyclerView.Adapter<CameraAdapter.CameraView
     @Override
     public void onBindViewHolder(@NonNull CameraViewHolder holder, int position) {
         CameraModel camera = cameraList.get(position);
-        String location = camera.getLocationName()+"/"+camera.getFloorName()+"/"+camera.getCardName();
+
+        String locationName = camera.getLocationName();
+        String location;
+
+        if (locationName != null) {
+            location = locationName + "/" + camera.getFloorName() + "/" + camera.getCardName();
+        } else {
+            location = "Not Linked.";
+        }
+
         // Set camera information to the views
         holder.txtCameraName.setText(camera.getCameraName());
         holder.txtCameraLocation.setText(location);

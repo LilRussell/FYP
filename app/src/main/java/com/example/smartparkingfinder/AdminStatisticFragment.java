@@ -16,19 +16,24 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AdminStatisticFragment extends Fragment {
     private RecyclerView recyclerView;
     private AdminGraphAdapter adapter;
     private List<AdminGraphItem> adminGraphItems;
     private DatabaseReference databaseReference;
-    private static final long UPDATE_INTERVAL_MS = 30 * 1000; // 30 seconds
+    private static final long UPDATE_INTERVAL_MS = 15 * 1000; // 15 seconds
+    private long lastUpdateTime = 0;
     private Handler handler;
     private Runnable updateGraphRunnable;
     private int previousAvailability = 0;
     private int xAxisValue = 0;
     private List<Entry> chartData = new ArrayList<>();
+    private Map<String, Entry> previousDataPoints = new HashMap<>();
+    private Map<String, List<Entry>> historicalDataPoints = new HashMap<>();
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -43,70 +48,96 @@ public class AdminStatisticFragment extends Fragment {
 
         // Initialize Firebase Database reference for the location path
         databaseReference = FirebaseDatabase.getInstance().getReference().child("location");
-
-        // Initialize a Handler for periodic updates
-        handler = new Handler();
-
-        // Initialize the Runnable to update the graph
-        updateGraphRunnable = new Runnable() {
-            @Override
-            public void run() {
-                xAxisValue += 30;
-                // Remove the previous listener to avoid duplicates
-                databaseReference.removeEventListener(valueEventListener);
-
-                // Start listening to database changes again
-                databaseReference.addValueEventListener(valueEventListener);
-
-                // Schedule the next update after the specified interval
-                handler.postDelayed(this, UPDATE_INTERVAL_MS);
-            }
-        };
-
-        // Start the initial graph update and schedule periodic updates
-        handler.post(updateGraphRunnable);
+        startGraphUpdate();
 
         return view;
     }
-
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-
-        // Remove the ValueEventListener and stop periodic updates when the view is destroyed
-        databaseReference.removeEventListener(valueEventListener);
-        handler.removeCallbacks(updateGraphRunnable);
+    public void onStart() {
+        super.onStart();
+        startGraphUpdate();
     }
 
-    private ValueEventListener valueEventListener = new ValueEventListener() {
-        @Override
-        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-            adminGraphItems.clear(); // Clear the existing data
+    @Override
+    public void onStop() {
+        super.onStop();
+        startGraphUpdate();
+    }
 
-            // Find the specific location with the key "NewZ4Zx95EtmdPDui8z"
-            DataSnapshot specificLocationSnapshot = dataSnapshot.child("-NewZ4Zx95EtmdPDui8z");
+    private void startGraphUpdate() {
+        handler = new Handler();
+        updateGraphRunnable = new Runnable() {
+            @Override
+            public void run() {
+                long currentTime = System.currentTimeMillis();
+                if (currentTime - lastUpdateTime >= UPDATE_INTERVAL_MS) {
+                    fetchAndPlotDataForAllLocations();
+                    lastUpdateTime = currentTime;
+                }
+                handler.post(this); // Continue the periodic update
+            }
+        };
+        handler.post(updateGraphRunnable);
+    }
 
-            if (specificLocationSnapshot.exists()) {
-                String locationId = specificLocationSnapshot.getKey(); // Get the location ID
-                int currentAvailability = specificLocationSnapshot.child("details").child("parkingAvailability").getValue(Integer.class);
+    private void stopGraphUpdate() {
+        if (handler != null && updateGraphRunnable != null) {
+            handler.removeCallbacks(updateGraphRunnable);
+        }
+    }
 
+    private void fetchAndPlotDataForAllLocations() {
+        // Fetch data for all locations
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                adminGraphItems.clear(); // Clear previous graph items
 
+                for (DataSnapshot locationSnapshot : dataSnapshot.getChildren()) {
+                    String locationName = locationSnapshot.child("details").child("name").getValue(String.class);
+                    Integer currentAvailability = locationSnapshot.child("details").child("parkingAvailability").getValue(Integer.class);
 
-                // Store the change in availability for the X-axis value in chartData
-                chartData.add(new Entry(xAxisValue, currentAvailability));
+                    if (locationName != null && currentAvailability != null) {
+                        // Create or update a graph item for each location
+                        AdminGraphItem graphItem = getGraphItemForLocation(locationName);
+                        List<Entry> chartData = graphItem.getChartData();
 
+                        // Retrieve the historical data points for this location
+                        List<Entry> historicalData = historicalDataPoints.getOrDefault(locationName, new ArrayList<>());
 
+                        // Add the new data point to the historical data
+                        historicalData.add(new Entry(xAxisValue, currentAvailability));
 
-                // Create an AdminGraphItem for the specific location with its own chart data
-                AdminGraphItem item = new AdminGraphItem(locationId, "X Axis Label", "Y Axis Label", chartData);
-                adminGraphItems.add(item);
+                        // Add all historical data points to the chart data
+                        chartData.addAll(historicalData);
+
+                        // Notify the adapter that the data has changed
+                        adapter.notifyDataSetChanged();
+
+                        // Update the historical data for this location
+                        historicalDataPoints.put(locationName, historicalData);
+                        xAxisValue += 1; // Increment x by 1 for each data point
+                    }
+                }
             }
 
-            adapter.notifyDataSetChanged(); // Notify the adapter that the data has changed
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Handle errors here
+            }
+        });
+    }
+    private AdminGraphItem getGraphItemForLocation(String locationName) {
+        for (AdminGraphItem graphItem : adminGraphItems) {
+            if (graphItem.getTitle().equals(locationName)) {
+                return graphItem; // Return the existing graph item for the location
+            }
         }
-        @Override
-        public void onCancelled(@NonNull DatabaseError databaseError) {
-            // Handle database error, if needed
-        }
-    };
+
+        // If no graph item exists for the location, create a new one
+        AdminGraphItem newGraphItem = new AdminGraphItem(locationName, "X Axis Label", "Y Axis Label", new ArrayList<>());
+        adminGraphItems.add(newGraphItem);
+        return newGraphItem;
+    }
 }
+

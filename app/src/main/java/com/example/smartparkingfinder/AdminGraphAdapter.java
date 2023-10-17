@@ -1,6 +1,7 @@
 package com.example.smartparkingfinder;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,12 +64,17 @@ public class AdminGraphAdapter extends RecyclerView.Adapter<AdminGraphAdapter.Vi
         }
     }
     private void setupLineChart(LineChart lineChart, List<Entry> chartData) {
-        // Customize the LineChart as needed (e.g., set labels, colors, etc.)
-
         // Create a LineDataSet with the chart data
         LineDataSet dataSet = new LineDataSet(chartData, "Data Set Name");
 
         // Customize the dataSet (e.g., set colors, labels, etc.)
+        dataSet.setColor(Color.BLUE); // Set the line color
+        dataSet.setCircleRadius(5f); // Set the radius of the data points
+        dataSet.setCircleColor(Color.BLUE); // Set the color of the data points
+        dataSet.setLineWidth(2f); // Set the line width
+
+        // Set the mode to LINEAR for connected points
+        dataSet.setMode(LineDataSet.Mode.LINEAR);
 
         // Create a LineData object with the dataSet
         LineData lineData = new LineData(dataSet);
@@ -78,6 +84,7 @@ public class AdminGraphAdapter extends RecyclerView.Adapter<AdminGraphAdapter.Vi
         lineChart.getAxisRight().setEnabled(false); // Disable the right Y-axis
         lineChart.getXAxis().setDrawAxisLine(true);
         lineChart.getXAxis().setDrawGridLines(false);
+
         // Set the LineData to the LineChart
         lineChart.setData(lineData);
 
