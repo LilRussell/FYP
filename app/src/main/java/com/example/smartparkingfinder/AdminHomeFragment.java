@@ -226,8 +226,10 @@ public class AdminHomeFragment extends Fragment {
         editLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Handle Edit Location button click here
-                // You can launch an edit location activity or perform any other action
+                String selectedLocationId = item.getId();
+                Intent intent = new Intent(requireActivity(), EditLocation.class);
+                intent.putExtra("locationId", selectedLocationId);
+                startActivity(intent);
             }
         });
 

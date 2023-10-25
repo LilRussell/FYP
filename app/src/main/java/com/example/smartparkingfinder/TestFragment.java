@@ -199,7 +199,7 @@ public class TestFragment extends Fragment {
         }
     }
     public void showImagePreview(InputStream inputStream) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(recyclerView.getContext(),R.style.CustomAlertDialogTheme));
         builder.setTitle("Image Preview");
 
         // Create an ImageView to display the image
@@ -214,6 +214,15 @@ public class TestFragment extends Fragment {
 
         // Create and show the AlertDialog
         AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+
+                Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+                // Set text color for negative button
+                negativeButton.setTextColor(getResources().getColor(R.color.black));
+            }
+        });
         dialog.show();
     }
     public void showImageFromFirebase(String cardId) {
@@ -240,7 +249,7 @@ public class TestFragment extends Fragment {
 
                             if (imageUrl != null) {
                                 // Create an alert dialog
-                                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+                                AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(recyclerView.getContext(),R.style.CustomAlertDialogTheme));
                                 builder.setTitle("Image Preview");
 
                                 // Create an ImageView to display the image
@@ -257,6 +266,15 @@ public class TestFragment extends Fragment {
 
                                 // Create and show the AlertDialog
                                 AlertDialog dialog = builder.create();
+                                dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                                    @Override
+                                    public void onShow(DialogInterface dialogInterface) {
+
+                                        Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+                                        // Set text color for negative button
+                                        negativeButton.setTextColor(getResources().getColor(R.color.black));
+                                    }
+                                });
                                 dialog.show();
                             } else {
                                 // Handle the case where imageUrl is null (no image available for this card)
@@ -686,32 +704,48 @@ public class TestFragment extends Fragment {
         }
     }
 
-
-
-
     void updateCardTitle(String cardId) {
         currentCardId = cardId;
 
         // Create an AlertDialog builder
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(recyclerView.getContext(), R.style.CustomAlertDialogTheme));
 
-        // Set up the input view
-        final EditText input = new EditText(requireContext());
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-        builder.setView(input);
+        // Set up the input views
+        final EditText input1 = new EditText(requireContext());
+        final EditText input2 = new EditText(requireContext());
+        input1.setHint("From Section");
+        input2.setHint("To Section");
+        input1.setTextColor(getResources().getColor(android.R.color.black));
+        input2.setTextColor(getResources().getColor(android.R.color.black));
 
-        builder.setTitle("Edit Card Title")
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        input1.setInputType(InputType.TYPE_CLASS_TEXT);
+        input2.setInputType(InputType.TYPE_CLASS_TEXT);
+
+        builder.setTitle("Edit Section Name:"); // Set the custom title layout
+
+        // Create a custom view for the dialog's content
+        LinearLayout layout = new LinearLayout(requireContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+
+        // Add the two EditText fields to the custom view
+        layout.addView(input1);
+        layout.addView(input2);
+
+        builder.setView(layout); // Set the custom view as the content
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String newTitle = input.getText().toString().trim();
-                        if (!TextUtils.isEmpty(newTitle)) {
+                        String text1 = input1.getText().toString().trim();
+                        String text2 = input2.getText().toString().trim();
+
+                        if (!TextUtils.isEmpty(text1) && !TextUtils.isEmpty(text2)) {
+                            String newTitle = text1 + " ~ " + text2;
                             // Handle the new title (e.g., save it or perform an action)
                             updateCardTitleInFirebase(newTitle);
-
                         } else {
-                            // Handle the case where the input is empty
-                            Toast.makeText(requireContext(), "Title cannot be empty", Toast.LENGTH_SHORT).show();
+                            // Handle the case where either input is empty
+                            Toast.makeText(requireContext(), "Both inputs are required", Toast.LENGTH_SHORT).show();
                         }
                     }
                 })
@@ -724,6 +758,19 @@ public class TestFragment extends Fragment {
 
         // Create and show the dialog
         AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+
+                // Set text color for positive button
+                positiveButton.setTextColor(getResources().getColor(R.color.black));
+
+                // Set text color for negative button
+                negativeButton.setTextColor(getResources().getColor(R.color.black));
+            }
+        });
         dialog.show();
     }
 

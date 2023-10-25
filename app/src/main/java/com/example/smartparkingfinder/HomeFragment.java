@@ -239,8 +239,10 @@ public class HomeFragment extends Fragment {
                                 locationRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot locationDataSnapshot) {
-                                        // Check if the location data exists
-                                        if (locationDataSnapshot.exists()) {
+                                        if (!locationDataSnapshot.exists()) {
+                                            // Location data does not exist, remove the ID from recentPlaces
+                                            recentPlaceSnapshot.getRef().setValue(null);
+                                        } else {
                                             DataSnapshot detailsSnapshot = locationDataSnapshot.child("details");
                                             String name = detailsSnapshot.child("name").getValue(String.class);
                                             String description = detailsSnapshot.child("description").getValue(String.class);

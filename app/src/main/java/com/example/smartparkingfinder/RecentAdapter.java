@@ -30,7 +30,7 @@ public class RecentAdapter extends RecyclerView.Adapter<RecentAdapter.ViewHolder
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.location_rv, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.recent_location, parent, false);
         return new ViewHolder(view);
     }
     @NonNull
@@ -38,7 +38,6 @@ public class RecentAdapter extends RecyclerView.Adapter<RecentAdapter.ViewHolder
     public void onBindViewHolder(@NonNull RecentAdapter.ViewHolder holder, int position) {
         locationRVModel locationRVModel = data.get(position);
         holder.locationTextView.setText(locationRVModel.getName());
-        holder.descriptionTextView.setText(locationRVModel.getDescription());
         holder.parkingAvailabilityTextView.setText("Parking Availability: " + locationRVModel.getParkingAvailability());
 
         // Load and display the image using Glide or a similar image loading library
@@ -68,14 +67,12 @@ public class RecentAdapter extends RecyclerView.Adapter<RecentAdapter.ViewHolder
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView locationImageView;
         TextView locationTextView;
-        TextView descriptionTextView;
         TextView parkingAvailabilityTextView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             locationImageView = itemView.findViewById(R.id.idImgLocation);
             locationTextView = itemView.findViewById(R.id.idLocation);
-            descriptionTextView = itemView.findViewById(R.id.idLocationDesc);
             parkingAvailabilityTextView = itemView.findViewById(R.id.idParkingAvailable);
         }
     }

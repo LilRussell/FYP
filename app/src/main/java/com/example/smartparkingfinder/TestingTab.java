@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -73,7 +74,7 @@ public class TestingTab extends AppCompatActivity {
                 Context context = view.getContext();
                 int tabCount = tabLayout.getTabCount();
                 // Create an AlertDialog to input the tab title
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(TestingTab.this,R.style.CustomAlertDialogTheme));
                 builder.setTitle("Enter Tab Title");
 
                 // Set up the input view
@@ -154,7 +155,7 @@ public class TestingTab extends AppCompatActivity {
             String currentTabId = tabInfoList.get(position).getId();
             if (currentTabId != null) {
                 // Create a confirmation dialog
-                AlertDialog.Builder builder = new AlertDialog.Builder(TestingTab.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(TestingTab.this,R.style.CustomAlertDialogTheme));
                 builder.setTitle("Confirm Deletion");
                 builder.setMessage("Are you sure you want to delete this tab?");
 
@@ -271,9 +272,7 @@ public class TestingTab extends AppCompatActivity {
         adapter.addFragment(fragment, tabTitle);
         fragments.add(fragment);
         adapter.notifyDataSetChanged();
-        if (tabCount==0) {
-            addCardButton.setVisibility(View.GONE);
-        }else {
+        if (adapter.getCount()>0) {
             addCardButton.setVisibility(View.VISIBLE);
         }
     }
@@ -288,9 +287,7 @@ public class TestingTab extends AppCompatActivity {
         fragments.add(fragment);
         // Notify the adapter that the data set has changed
         adapter.notifyDataSetChanged();
-        if (Count!=0) {
-            addCardButton.setVisibility(View.GONE);
-        }else {
+        if (adapter.getCount()>0) {
             addCardButton.setVisibility(View.VISIBLE);
         }
 
@@ -373,7 +370,7 @@ public class TestingTab extends AppCompatActivity {
                     }
                 }
                 viewPager.setOffscreenPageLimit(tabCount);
-                if (tabCount==0) {
+                if (adapter.getCount()==0) {
                     addCardButton.setVisibility(View.GONE);
                 } else {
                     addCardButton.setVisibility(View.VISIBLE);

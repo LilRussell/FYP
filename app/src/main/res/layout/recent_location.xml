@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_gravity="center"
+    android:layout_margin="5dp"
+    app:cardCornerRadius="20dp"
+
+    app:cardBackgroundColor="@color/cardColor"
+    app:cardElevation="80dp">
+
+    <RelativeLayout
+        android:layout_width="301dp"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/idImgLocation"
+            android:layout_width="99dp"
+            android:layout_height="90dp"
+            android:scaleType="centerCrop" />
+
+        <TextView
+            android:id="@+id/idLocation"
+            android:layout_width="271dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/idImgLocation"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="99dp"
+            android:layout_marginTop="-83dp"
+            android:layout_marginEnd="15dp"
+
+            android:layout_marginBottom="3dp"
+            android:fontFamily="sans-serif-medium"
+            android:padding="4dp"
+            android:shadowColor="#808080"
+            android:shadowDx="2"
+            android:shadowDy="4"
+            android:shadowRadius="3"
+            android:singleLine="true"
+            android:text="@string/location"
+            android:textColor="@color/black"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/idParkingAvailable"
+            android:layout_width="271dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/idLocation"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="101dp"
+
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginBottom="13dp"
+            android:fontFamily="sans-serif-medium"
+            android:padding="4dp"
+            android:shadowColor="#808080"
+            android:shadowDx="2"
+            android:shadowDy="4"
+            android:shadowRadius="3"
+            android:singleLine="true"
+            android:text="@string/parking_available"
+            android:textColor="@color/black"
+            android:textSize="18sp" />
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

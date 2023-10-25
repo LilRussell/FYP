@@ -177,9 +177,11 @@ public class AdminHomepage extends AppCompatActivity {
                 camerasRef.child("ownedBy").setValue(adminId);
                 camerasRef.child("assignedLocation").setValue("None");
                 camerasRef.child("assignedCard").setValue("None");
+                camerasRef.child("assignedTab").setValue("None");
                 camerasRef.child("statusA").setValue("");
                 camerasRef.child("statusB").setValue("");
                 camerasRef.child("statusC").setValue("");
+                camerasRef.child("status").setValue("Offline");
                 // Close the dialog
                 dialog.dismiss();
             }
