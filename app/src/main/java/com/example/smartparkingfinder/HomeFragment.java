@@ -71,11 +71,13 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
 
+        userID =UserData.getInstance().getUserID();
+
         // Initialize Firebase
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference("location");
         DatabaseReference cameraRef = database.getReference("camera");
-        DatabaseReference userRef = database.getReference("users");
+        DatabaseReference userRef = database.getReference("users").child(userID).child("recentPlaces");
         FirebaseApp.initializeApp(requireContext());
 
         mRecyclerView = rootView.findViewById(R.id.verticalRecyclerView_Main);
@@ -90,11 +92,7 @@ public class HomeFragment extends Fragment {
         HorizontalRV.setLayoutManager(horizontalLayoutManager);
         adapterRecent = new RecentAdapter(requireContext(),recentLocationList);
         HorizontalRV.setAdapter(adapterRecent);
-        Bundle argsH = getArguments();
-        if (argsH != null) {
-            userID = argsH.getString("userID");
 
-        }
         // Set an item click listener for the adapter
         adapter.setOnItemClickListener(new UserAdapter.OnItemClickListener() {
             @Override
@@ -226,45 +224,41 @@ public class HomeFragment extends Fragment {
                 // Clear the list to avoid duplicates when the database changes
                 recentLocationList.clear();
 
-                for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
-                    DataSnapshot recentPlacesSnapshot = userSnapshot.child("recentPlaces");
+                for (DataSnapshot recentPlaceSnapshot : dataSnapshot.getChildren()) {
+                    String recentPlaceId = recentPlaceSnapshot.getValue(String.class);
+                    Log.d("Recent", recentPlaceId);
 
-                    if (recentPlacesSnapshot.exists()) {
-                        for (DataSnapshot recentPlaceSnapshot : recentPlacesSnapshot.getChildren()) {
-                            String recentPlaceId = recentPlaceSnapshot.getValue(String.class);
-                            if (recentPlaceId != null) {
-                                DatabaseReference locationRef = database.getReference("location").child(recentPlaceId);
+                    if (recentPlaceId != null) {
+                        DatabaseReference locationRef = database.getReference("location").child(recentPlaceId);
 
-                                // Add a listener for the specific location ID
-                                locationRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot locationDataSnapshot) {
-                                        if (!locationDataSnapshot.exists()) {
-                                            // Location data does not exist, remove the ID from recentPlaces
-                                            recentPlaceSnapshot.getRef().setValue(null);
-                                        } else {
-                                            DataSnapshot detailsSnapshot = locationDataSnapshot.child("details");
-                                            String name = detailsSnapshot.child("name").getValue(String.class);
-                                            String description = detailsSnapshot.child("description").getValue(String.class);
-                                            Integer parkingAvailabilityObj = detailsSnapshot.child("parkingAvailability").getValue(Integer.class);
-                                            String imageURL = detailsSnapshot.child("imageURL").getValue(String.class);
+                        // Add a listener for the specific location ID
+                        locationRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot locationDataSnapshot) {
+                                if (!locationDataSnapshot.exists()) {
+                                    // Location data does not exist, remove the ID from recentPlaces
+                                    recentPlaceSnapshot.getRef().removeValue();
+                                } else {
+                                    DataSnapshot detailsSnapshot = locationDataSnapshot.child("details");
+                                    String name = detailsSnapshot.child("name").getValue(String.class);
+                                    String description = detailsSnapshot.child("description").getValue(String.class);
+                                    Integer parkingAvailabilityObj = detailsSnapshot.child("parkingAvailability").getValue(Integer.class);
+                                    String imageURL = detailsSnapshot.child("imageURL").getValue(String.class);
 
-                                            if (name != null && description != null) {
-                                                Log.d("Get Location", "Got Value");
-                                                locationRVModel locationData = new locationRVModel(recentPlaceId, name, description, parkingAvailabilityObj, imageURL);
-                                                recentLocationList.add(locationData);
-                                                adapterRecent.setData(recentLocationList);
-                                            }
-                                        }
+                                    if (name != null && description != null) {
+                                        Log.d("Get Location", "Got Value");
+                                        locationRVModel locationData = new locationRVModel(recentPlaceId, name, description, parkingAvailabilityObj, imageURL);
+                                        recentLocationList.add(locationData);
+                                        adapterRecent.setData(recentLocationList);
                                     }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError locationDatabaseError) {
-                                        // Handle errors here
-                                    }
-                                });
+                                }
                             }
-                        }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError locationDatabaseError) {
+                                // Handle errors here
+                            }
+                        });
                     }
                 }
             }

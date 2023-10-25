@@ -5,7 +5,7 @@
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="register">Register</string>
-    <string name="sign_up_now">Sign Up Now!</string>
+    <string name="sign_up_now">New User?<u>Click Here to Sign Up Now!</u> </string>
     <string name="car_register">Car Register</string>
     <string name="history">History</string>
     <string name="home">Home</string>
@@ -64,5 +64,6 @@
     <string name="upload_parking_floor_plan_for_easier_navigation"><u>Upload Parking Floor Plan For Easier Navigation</u></string>
     <string name="preview_and_save_images"><u>Preview and Save Images</u></string>
     <string name="more_info"><u>More Info.</u></string>
+    <string name="forgot_password"><u>Forgot Password?</u></string>
 
 </resources>

@@ -19,6 +19,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 public class Register extends AppCompatActivity {
 
     private TextInputEditText txtEditEmail, txtEditPassword;
@@ -62,7 +65,7 @@ public class Register extends AppCompatActivity {
             Toast.makeText(Register.this, "Password must be at least 6 characters long", Toast.LENGTH_SHORT).show();
             return; // Stop the registration process
         }
-
+        String hashedPassword = hashPassword(password);
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -73,7 +76,7 @@ public class Register extends AppCompatActivity {
                                 String uid = user.getUid();
                                 // Store user data in the Realtime Database
                                 mDatabase.child(uid).child("email").setValue(email);
-                                mDatabase.child(uid).child("password").setValue(password);
+                                mDatabase.child(uid).child("password").setValue(hashedPassword);
                                 mDatabase.child(uid).child("role").setValue("user");
 
                                 // Registration success
@@ -85,6 +88,24 @@ public class Register extends AppCompatActivity {
                         }
                     }
                 });
+    }
+    // Password hashing using SHA-256
+    private String hashPassword(String password) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hashedBytes = md.digest(password.getBytes());
+
+            // Convert the byte array to a hexadecimal string
+            StringBuilder builder = new StringBuilder();
+            for (byte b : hashedBytes) {
+                builder.append(String.format("%02x", b));
+            }
+
+            return builder.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
     private void showSuccessDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);

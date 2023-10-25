@@ -62,4 +62,5 @@ dependencies {
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
     implementation 'com.github.cachapa:ExpandableLayout:2.9.2'
     implementation 'com.squareup.picasso:picasso:2.8'
+    implementation 'at.favre.lib:bcrypt:0.9.0'
 }

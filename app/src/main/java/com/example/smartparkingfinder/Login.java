@@ -1,9 +1,14 @@
 package com.example.smartparkingfinder;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Button;
 import android.widget.Toast;
@@ -22,10 +27,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 public class Login extends AppCompatActivity {
-    TextView textView;
-    private TextInputEditText txtEditEmail, txtEditPassword;
+    TextView textView,txtForgotPassword;
+    private EditText txtEditEmail,txtEditPassword;
     private Button btnLogin;
-
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
     @Override
@@ -33,8 +37,8 @@ public class Login extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        txtEditEmail = findViewById(R.id.txtEdit_email);
-        txtEditPassword = findViewById(R.id.txtEdit_password);
+        txtEditEmail = findViewById(R.id.txtEdit_Email);
+        txtEditPassword = findViewById(R.id.txtEdit_Password);
         btnLogin = findViewById(R.id.btn_login);
         textView = findViewById(R.id.signup);
         textView.setOnClickListener(new View.OnClickListener() {
@@ -43,6 +47,13 @@ public class Login extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(),Register.class);
                 startActivity(intent);
                 finish();
+            }
+        });
+        txtForgotPassword = findViewById(R.id.txt_ForgotPass);
+        txtForgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showForgotPasswordDialog();
             }
         });
         mAuth = FirebaseAuth.getInstance();
@@ -114,5 +125,49 @@ public class Login extends AppCompatActivity {
                 Toast.makeText(Login.this, "Failed to check user role.", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+    private void showForgotPasswordDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Reset Password");
+
+        // Create an EditText for the email address
+        final EditText emailEditText = new EditText(this);
+        emailEditText.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        emailEditText.setHint("Enter your email");
+
+        builder.setView(emailEditText);
+
+        // Add a positive button (Send) to the dialog
+        builder.setPositiveButton("Send", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String email = emailEditText.getText().toString().trim();
+                sendPasswordResetEmail(email);
+            }
+        });
+
+        // Add a negative button (Cancel) to the dialog
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+    private void sendPasswordResetEmail(String email) {
+        mAuth.sendPasswordResetEmail(email)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(Login.this, "Password reset email sent. Check your inbox.", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(Login.this, "Failed to send reset email. Please check your email address.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 }
