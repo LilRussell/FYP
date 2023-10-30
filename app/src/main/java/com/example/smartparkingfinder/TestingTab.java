@@ -29,13 +29,14 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class TestingTab extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private TestTabAdapter adapter;
     private Button addTabButton,addCardButton,deleteTabButton;
-    private String locationId;
+    private String locationId,locationName;
     private String adminId;
     private Toolbar toolbar;
     private int count=0;
@@ -48,6 +49,9 @@ public class TestingTab extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_testing_tab);
         toolbar = findViewById(R.id.toolbar);
+        locationName = getIntent().getStringExtra("locationName").toUpperCase(Locale.ROOT);
+        Log.d("title",locationName);
+        toolbar.setTitle(locationName);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         locationId = getIntent().getStringExtra("locationId");
@@ -277,20 +281,34 @@ public class TestingTab extends AppCompatActivity {
         }
     }
 
-    private void addNewTab(int Count,String title) {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference locationRef = database.getReference("location").child(locationId);
-        TestFragment fragment = new TestFragment();
-        viewPager.setOffscreenPageLimit(Count);
-        adapter.addFragment(fragment, title);
-        saveTabToFirebase(locationRef, title);
-        fragments.add(fragment);
-        // Notify the adapter that the data set has changed
-        adapter.notifyDataSetChanged();
-        if (adapter.getCount()>0) {
-            addCardButton.setVisibility(View.VISIBLE);
+    private void addNewTab(int Count, String title) {
+        // Check if a tab with the same title exists
+        boolean isTabTitleExists = false;
+        for (TabInfo tabInfo : tabInfoList) {
+            if (tabInfo.getTitle().equals(title)) {
+                isTabTitleExists = true;
+                break;
+            }
         }
 
+        if (isTabTitleExists) {
+            // Show an error message or handle the case where a similar tab title exists
+            Toast.makeText(this, "Tab title already exists", Toast.LENGTH_SHORT).show();
+        } else {
+            // Create a new tab if the title is unique
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference locationRef = database.getReference("location").child(locationId);
+            TestFragment fragment = new TestFragment();
+            viewPager.setOffscreenPageLimit(Count);
+            adapter.addFragment(fragment, title);
+            saveTabToFirebase(locationRef, title);
+            fragments.add(fragment);
+            // Notify the adapter that the data set has changed
+            adapter.notifyDataSetChanged();
+            if (adapter.getCount() > 0) {
+                addCardButton.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     private void saveTabToFirebase(DatabaseReference locationRef, String tabTitle) {

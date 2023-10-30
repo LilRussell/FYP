@@ -6,10 +6,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
@@ -24,17 +28,20 @@ import java.security.NoSuchAlgorithmException;
 
 public class Register extends AppCompatActivity {
 
-    private TextInputEditText txtEditEmail, txtEditPassword;
+    private EditText txtEditEmail, txtEditPassword;
     private Button btnRegister;
 
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
-
+    private Toolbar toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-
+        toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle("Add New Location ");
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         txtEditEmail = findViewById(R.id.txtEdit_email);
         txtEditPassword = findViewById(R.id.txtEdit_password);
         btnRegister = findViewById(R.id.btn_register);
@@ -48,6 +55,23 @@ public class Register extends AppCompatActivity {
                 registerUser();
             }
         });
+    }@Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == android.R.id.home) {
+            // Handle the back button click
+            navigateToLoginScreen();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }private void navigateToLoginScreen() {
+        Intent intent = new Intent(this, Login.class);
+        startActivity(intent);
+
+        // Finish the current activity to prevent the user from navigating back to it
+        finish();
     }
 
     private void registerUser() {

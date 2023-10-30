@@ -65,5 +65,6 @@
     <string name="preview_and_save_images"><u>Preview and Save Images</u></string>
     <string name="more_info"><u>More Info.</u></string>
     <string name="forgot_password"><u>Forgot Password?</u></string>
+    <string name="press_in_the_parking_section_to_save_where_you_parked">Press (_____) in the Parking Section to Save Where You Parked.</string>
 
 </resources>

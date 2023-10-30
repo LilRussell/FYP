@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -127,12 +128,13 @@ public class Login extends AppCompatActivity {
         });
     }
     private void showForgotPasswordDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this,R.style.CustomAlertDialogTheme));
         builder.setTitle("Reset Password");
 
         // Create an EditText for the email address
         final EditText emailEditText = new EditText(this);
         emailEditText.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        emailEditText.setTextColor(getResources().getColor(R.color.black));
         emailEditText.setHint("Enter your email");
 
         builder.setView(emailEditText);
@@ -155,6 +157,19 @@ public class Login extends AppCompatActivity {
         });
 
         AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+
+                // Set text color for positive button
+                positiveButton.setTextColor(getResources().getColor(R.color.black));
+
+                // Set text color for negative button
+                negativeButton.setTextColor(getResources().getColor(R.color.black));
+            }
+        });
         dialog.show();
     }
     private void sendPasswordResetEmail(String email) {

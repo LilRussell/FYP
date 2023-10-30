@@ -1,12 +1,15 @@
 package com.example.smartparkingfinder;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,12 +20,14 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.util.Locale;
 
 public class EditLocation extends AppCompatActivity {
 
@@ -31,12 +36,19 @@ public class EditLocation extends AppCompatActivity {
     private Uri filePath; // To store the selected image URI
     private static final int PICK_IMAGE_REQUEST = 71; // Request code for image selection
     private StorageReference storageReference;
-    private String locationId;
+    private String locationId,locationName;
     private String originalImageUrl;
+    private Toolbar toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_location);
+        toolbar = findViewById(R.id.toolbar);
+        locationName = getIntent().getStringExtra("locationName").toUpperCase(Locale.ROOT);
+        Log.d("title",locationName);
+        toolbar.setTitle("Editing "+locationName);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Button saveButton = findViewById(R.id.btn_save_location);
         Button chooseImageButton = findViewById(R.id.button_choose_image);
         locationId = getIntent().getStringExtra("locationId");
@@ -63,17 +75,32 @@ public class EditLocation extends AppCompatActivity {
                 if (filePath != null) {
                     // Upload the image to Firebase Storage
                     uploadImage(locationId,locationName, locationDescription);
-                } else {
-                    if (originalImageUrl != null) {
-                        // Use the original imageUrl for the existing location
-                        updateLocationDetails(locationId,locationName, locationDescription, originalImageUrl);
-                    } else{
+                } else{
+
                         Toast.makeText(getApplicationContext(), "Please select an image", Toast.LENGTH_SHORT).show();
-                    }
                 }
+
             }
         });
 
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == android.R.id.home) {
+            // Handle the back button click
+            navigateToAdminHomepage();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }private void navigateToAdminHomepage() {
+        Intent intent = new Intent(this, AdminHomepage.class);
+        startActivity(intent);
+
+        // Finish the current activity to prevent the user from navigating back to it
+        finish();
     }
     @Override
     public void onBackPressed() {
@@ -105,39 +132,96 @@ public class EditLocation extends AppCompatActivity {
         }
     }
 
-    private void uploadImage(String locationId,String locationName, String locationDescription) {
-        if (filePath != null) {
-            // Reference to the location under "location/id/details"
-            DatabaseReference locationRef = mDatabase.child("location").child(locationId).child("details");
+    private void uploadImage(String locationId, String locationName, String locationDescription) {
+        DatabaseReference locationRef = mDatabase.child("location");
 
-            StorageReference imageRef = storageReference.child(locationName + ".jpg");
+        locationRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
 
-            // Upload the image to Firebase Storage
-            imageRef.putFile(filePath)
-                    .addOnSuccessListener(taskSnapshot -> {
-                        // Image uploaded successfully
-                        // Get the download URL of the uploaded image
-                        imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                    String currentLocationName = null; // Initialize as null
+                    boolean locationNameExists = false; // Initialize as false
 
-                            // Create a Location object with name, description, parking number, and image URL
-                            locationRVModel location = new locationRVModel(locationId, locationName, locationDescription, 0, uri.toString());
+                    // Find the current location's name by its locationId
+                    for (DataSnapshot locationSnapshot : dataSnapshot.getChildren()) {
+                        if (locationId != null && locationId.equals(locationSnapshot.getKey())) {
+                            currentLocationName = locationSnapshot.child("details/name").getValue(String.class);
+                            break; // Exit the loop once the name is found
+                        }
+                    }
+                if (!currentLocationName.equals(locationName)) {
+                    // The name has been changed; check for similar names
+                    for (DataSnapshot locationSnapshot : dataSnapshot.getChildren()) {
+                        String name = locationSnapshot.child("details/name").getValue(String.class);
 
-                            // Save the location to Firebase Realtime Database under "location/id/details"
-                            locationRef.setValue(location);
+                        if (name != null && name.equals(locationName)) {
+                            // A location with the same name already exists, show an error message
+                            locationNameExists=true;
+                            Toast.makeText(getApplicationContext(), "Location with the same name already exists. Please use a different name.", Toast.LENGTH_SHORT).show();
+                            return; // Exit the loop and function
+                        }
+                    }
+                }
+                if (locationNameExists) {
+                    // A location with the same name already exists, show an error message
+                    Toast.makeText(getApplicationContext(), "Location with the same name already exists. Please use a different name.", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                        // The name is unique; proceed with the update
+                        locationRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                    // The name remains unchanged, proceed with updating
+                                    if (filePath != null) {
+                                        // Reference to the location under "location/id/details"
+                                        DatabaseReference locationDetailsRef = mDatabase.child("location").child(locationId).child("details");
 
-                            // Clear the EditText fields after saving
-                            ((EditText) findViewById(R.id.edt_location_name)).setText("");
-                            ((EditText) findViewById(R.id.edt_location_desc)).setText("");
-                            imageView.setImageDrawable(null);
-                            Toast.makeText(getApplicationContext(), "Location and Image saved!", Toast.LENGTH_SHORT).show();
+                                        StorageReference imageRef = storageReference.child(locationName + ".jpg");
+
+                                        // Upload the image to Firebase Storage
+                                        imageRef.putFile(filePath)
+                                                .addOnSuccessListener(taskSnapshot -> {
+                                                    // Image uploaded successfully
+                                                    // Get the download URL of the uploaded image
+                                                    imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                                                        // Update the location data with the new values
+                                                        locationDetailsRef.child("name").setValue(locationName);
+                                                        locationDetailsRef.child("description").setValue(locationDescription);
+                                                        locationDetailsRef.child("imageURL").setValue(uri.toString());
+
+                                                        // Clear the EditText fields after saving
+                                                        ((EditText) findViewById(R.id.edt_location_name)).setText("");
+                                                        ((EditText) findViewById(R.id.edt_location_desc)).setText("");
+                                                        imageView.setImageDrawable(null); // Clear the ImageView
+
+                                                        Toast.makeText(getApplicationContext(), "Location and Image saved!", Toast.LENGTH_SHORT).show();
+                                                    });
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    // Handle upload failure
+                                                    Toast.makeText(getApplicationContext(), "Failed to upload image: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                });
+
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                // Handle errors here
+                                Toast.makeText(getApplicationContext(), "Database error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
                         });
-                    })
-                    .addOnFailureListener(e -> {
-                        // Handle upload failure
-                        Toast.makeText(getApplicationContext(), "Failed to upload image: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    });
-        }
+                    }
+                }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Handle errors here
+                Toast.makeText(getApplicationContext(), "Database error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
     private void getLocationDetails(String locationId) {
         DatabaseReference locationRef = FirebaseDatabase.getInstance().getReference().child("location").child(locationId).child("details");
 
@@ -172,16 +256,13 @@ public class EditLocation extends AppCompatActivity {
             }
         });
     }
-    private void updateLocationDetails(String locationId,String locationName, String locationDescription, String imageUrl) {
+    private void updateLocationDetails(String locationId,String locationName, String locationDescription,String originalImageUrl) {
         // Reference to the location under "location/id/details"
         DatabaseReference locationRef = mDatabase.child("location").child(locationId).child("details");
 
-        // Create a Location object with name, description, parking number, and image URL
-        locationRVModel location = new locationRVModel(locationId, locationName, locationDescription, 0, imageUrl);
-
-        // Save the location to Firebase Realtime Database under "location/id/details"
-        locationRef.setValue(location);
-
+        locationRef.child("name").setValue(locationName);
+        locationRef.child("description").setValue(locationDescription);
+        locationRef.child("imageURL").setValue(originalImageUrl);
         // Clear the EditText fields after saving
         ((EditText) findViewById(R.id.edt_location_name)).setText("");
         ((EditText) findViewById(R.id.edt_location_desc)).setText("");

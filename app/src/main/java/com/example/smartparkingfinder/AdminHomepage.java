@@ -1,7 +1,9 @@
 package com.example.smartparkingfinder;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,6 +25,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -57,8 +60,8 @@ public class AdminHomepage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_homepage);
         toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
+        setSupportActionBar(toolbar);
         adminId = UserData.getInstance().getUserID();
         mAuth = FirebaseAuth.getInstance();
         mAuth = FirebaseAuth.getInstance();
@@ -116,18 +119,22 @@ public class AdminHomepage extends AppCompatActivity {
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater=getMenuInflater();
-        inflater.inflate(R.menu.toolbar_menu,menu);
-        return true;
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu); // Inflate the standard toolbar menu
+
+        // Apply the custom style to the popup menu
+        Context wrapper = new ContextThemeWrapper(this, R.style.PopupMenuStyle);
+        PopupMenu popupMenu = new PopupMenu(wrapper, findViewById(R.id.add_camera)); // Use the ID of the "Add Camera" item
+
+        // Inflate the menu with the custom style
+        MenuInflater inflater = popupMenu.getMenuInflater();
+        inflater.inflate(R.menu.toolbar_menu, popupMenu.getMenu()); // Replace with your menu resource
+
+        return super.onCreateOptionsMenu(menu);
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
-        if (id == R.id.settings) {
-
-            return true;
-        } else if (id == R.id.add_camera) {
+        if (id == R.id.add_camera) {
             showInputDialog();
             return true;
         }else if (id==R.id.tb_logout){
@@ -157,10 +164,11 @@ public class AdminHomepage extends AppCompatActivity {
 
         // Set dialog title and message
         builder.setTitle("Register Your Camera");
-        builder.setMessage("Please enter your CameraID:");
+        builder.setMessage("Please enter your Camera ID:");
 
         // Create an EditText widget for text input
         final EditText inputEditText = new EditText(this);
+        inputEditText.setTextColor(getResources().getColor(R.color.black));
         builder.setView(inputEditText);
 
         // Set positive (OK) button action
@@ -168,22 +176,40 @@ public class AdminHomepage extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // Handle OK button click
-                String userInput = inputEditText.getText().toString();
+                final String userInput = inputEditText.getText().toString();
 
-                // Define the path where you want to store the camera name
-                DatabaseReference camerasRef = FirebaseDatabase.getInstance().getReference("camera").child(userInput);
+                // Define the path where you want to check if a camera with the same ID exists
+                DatabaseReference camerasRef = FirebaseDatabase.getInstance().getReference("camera");
 
-                // Set the camera name under the defined path
-                camerasRef.child("ownedBy").setValue(adminId);
-                camerasRef.child("assignedLocation").setValue("None");
-                camerasRef.child("assignedCard").setValue("None");
-                camerasRef.child("assignedTab").setValue("None");
-                camerasRef.child("statusA").setValue("");
-                camerasRef.child("statusB").setValue("");
-                camerasRef.child("statusC").setValue("");
-                camerasRef.child("status").setValue("Offline");
-                // Close the dialog
-                dialog.dismiss();
+                // Query the database to check if a camera with the same ID exists
+                camerasRef.orderByKey().equalTo(userInput).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            // A camera with the same ID already exists
+                            Toast.makeText(AdminHomepage.this, "A camera with the same ID already exists. Please use a different Camera ID.", Toast.LENGTH_LONG).show();
+                        } else {
+                            // The Camera ID is unique; proceed with registration
+                            DatabaseReference newCameraRef = camerasRef.child(userInput);
+                            newCameraRef.child("ownedBy").setValue(adminId);
+                            newCameraRef.child("assignedLocation").setValue("None");
+                            newCameraRef.child("assignedCard").setValue("None");
+                            newCameraRef.child("assignedTab").setValue("None");
+                            newCameraRef.child("statusA").setValue("");
+                            newCameraRef.child("statusB").setValue("");
+                            newCameraRef.child("statusC").setValue("");
+                            newCameraRef.child("status").setValue("Offline");
+
+                            // Close the dialog
+                            dialog.dismiss();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        // Handle any errors that occur when reading from the database
+                    }
+                });
             }
         });
 

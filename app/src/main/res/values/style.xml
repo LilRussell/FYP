@@ -25,4 +25,8 @@
         <!-- Set the background color for the toolbar -->
         <item name="android:background">@color/status_bar_color</item> <!-- Replace with your desired color code -->
     </style>
+    <style name="PopupMenuStyle" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">@color/cardColor</item> <!-- Set your desired background color -->
+        <item name="android:textColor">@color/black</item> <!-- Set your desired text color for menu items -->
+    </style>
 </resources>

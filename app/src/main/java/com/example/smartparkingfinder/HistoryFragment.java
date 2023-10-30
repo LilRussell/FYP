@@ -14,6 +14,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -31,6 +33,8 @@ import java.util.List;
 public class HistoryFragment extends Fragment {
 
     private RecyclerView recyclerView;
+    private ImageView IVTicket;
+    private TextView txt_historyNotice;
     private HistoryAdapter adapter;
     private List<HistoryItem> historyItemList;
     private String userID;
@@ -44,6 +48,8 @@ public class HistoryFragment extends Fragment {
         userID = UserData.getInstance().getUserID();
         // Initialize RecyclerView and historyItemList
         recyclerView = view.findViewById(R.id.RV_history);
+        txt_historyNotice = view.findViewById(R.id.txt_historyNotice);
+        IVTicket = view.findViewById(R.id.imageView3);
         historyItemList = new ArrayList<>();
 
         // Initialize and set up the adapter
@@ -82,7 +88,13 @@ public class HistoryFragment extends Fragment {
                 historyItemList.addAll(0, newItems);
                 // Notify the adapter that the data has changed
                 adapter.notifyDataSetChanged();
-
+                if (historyItemList.isEmpty()) {
+                    txt_historyNotice.setVisibility(View.VISIBLE);
+                    IVTicket.setVisibility(View.VISIBLE);
+                } else {
+                    txt_historyNotice.setVisibility(View.GONE);
+                    IVTicket.setVisibility(View.GONE);
+                }
             }
 
             @Override

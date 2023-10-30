@@ -498,6 +498,12 @@ public class UserFragment extends Fragment {
 
 
                             }
+                            Toast.makeText(requireContext(), "Saved Details To History.", Toast.LENGTH_LONG).show();
+
+                        }
+                        else {
+                            // No car found, show a toast message to the user
+                            Toast.makeText(requireContext(), "Failed To Save History. Please register your car.\n Make Sure to Set Default Car.", Toast.LENGTH_LONG).show();
                         }
                     }
 

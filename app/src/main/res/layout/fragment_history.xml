@@ -11,9 +11,35 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true" />
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="1dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="-1dp" />
 
+    <TextView
+        android:id="@+id/txt_historyNotice"
+        android:layout_width="361dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"
+        android:layout_marginStart="26dp"
+        android:layout_marginTop="347dp"
+        android:text="@string/press_in_the_parking_section_to_save_where_you_parked"
+        android:textSize="20dp"
+        android:textStyle="bold" />
 
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="40dp"
+        android:layout_height="47dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginTop="338dp"
+        android:layout_marginEnd="278dp"
+        app:srcCompat="@drawable/icons8_parking_ticket_96" />
 
 
 </RelativeLayout>

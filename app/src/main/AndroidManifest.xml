@@ -56,7 +56,8 @@
         <activity
             android:name=".Register"
             android:exported="false"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme"
+            android:parentActivityName=".Login">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />

@@ -26,5 +26,20 @@
 
         />
 
+    <TextView
+        android:id="@+id/txt_carRegisterNotice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"
+        android:layout_marginStart="22dp"
+        android:layout_marginTop="339dp"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:text="Register Your Car To Save Parking History."
+        android:textStyle="bold"
+        android:textSize="20dp" />
+
 
 </RelativeLayout>

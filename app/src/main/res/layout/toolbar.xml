@@ -5,7 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
     android:background="@drawable/gradient"
+    app:subtitleTextColor="@color/black"
     android:id="@+id/toolbar"
+    app:popupTheme="@style/PopupMenuStyle"
     app:layout_scrollFlags="scroll|enterAlways"
     >
 

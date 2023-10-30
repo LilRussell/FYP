@@ -1,53 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="15dp"
+
     tools:context=".Register">
+    <include layout="@layout/toolbar"/>
 
-
-    <TextView
-        android:gravity="center"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="20sp"
-        android:text="@string/register"
+    <!-- CardView as the white box background -->
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="470dp"
+        android:layout_centerInParent="true"
+        android:background="@drawable/gradient_yellow"
+        android:layout_marginRight="30dp"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="4dp">
 
-        />
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/txtEdit_email"
-            android:hint="@string/email"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            />
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:background="@drawable/gradient_yellow"
+            android:orientation="vertical">
 
-    </com.google.android.material.textfield.TextInputLayout>
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/txtEdit_password"
-            android:hint="@string/password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            />
+            <ImageView
+                android:layout_width="88dp"
+                android:layout_height="113dp"
+                app:srcCompat="@drawable/icon_parkng" />
 
-    </com.google.android.material.textfield.TextInputLayout>
-    <Button
-        android:id="@+id/btn_register"
-        android:text="@string/register"
-        android:layout_marginTop="20dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+            <TextView
+                android:layout_width="344dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20sp"
+                android:fontFamily="sans-serif"
+                android:gravity="center"
+                android:text="Sign Up as New User Now!"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+            <EditText
+                android:id="@+id/txtEdit_email"
+                android:layout_width="300dp"
+                android:layout_height="50dp"
+                android:hint="@string/email"
+                android:ems="10"
+                android:inputType="textEmailAddress"
+                android:textColor="@color/black"
+                android:textColorHint="@color/black"
+                android:background="@color/cardColor"
+                android:layout_marginBottom="10dp"
+                android:fontFamily="sans-serif-medium"
+                android:paddingStart="10dp"
+                />
+
+            <EditText
+                android:id="@+id/txtEdit_password"
+                android:layout_width="300dp"
+                android:layout_height="45dp"
+                android:background="@color/cardColor"
+                android:ems="10"
+                android:hint="@string/password"
+                android:inputType="textPassword"
+                android:textColor="@color/black"
+                android:textColorHint="@color/black"
+                android:fontFamily="sans-serif-medium"
+                android:paddingStart="10dp"
+                />
 
 
-</LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_marginTop="20dp"
+                android:id="@+id/btn_register"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/black"
+                android:text="@string/register"
+                app:cornerRadius="8dp"
+                android:background="@drawable/gradient_blue"
+                app:layout_constraintTop_toBottomOf="@id/txtEdit_Password"
+                app:layout_constraintStart_toStartOf="parent" />
+
+
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</RelativeLayout>

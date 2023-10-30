@@ -227,8 +227,10 @@ public class AdminHomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 String selectedLocationId = item.getId();
+                String selectedLocationName = item.getName();
                 Intent intent = new Intent(requireActivity(), EditLocation.class);
                 intent.putExtra("locationId", selectedLocationId);
+                intent.putExtra("locationName",selectedLocationName);
                 startActivity(intent);
             }
         });
@@ -238,9 +240,11 @@ public class AdminHomeFragment extends Fragment {
             public void onClick(View v) {
                 // Handle Edit Parking Layout button click here
                 String selectedLocationId = item.getId();
+                String selectedLocationName = item.getName();
                 // You can launch an edit parking layout activity or perform any other action
                 Intent intent = new Intent(requireActivity(), TestingTab.class);
                 intent.putExtra("locationId", selectedLocationId);
+                intent.putExtra("locationName",selectedLocationName);
                 intent.putExtra("adminId",adminId);
                 startActivity(intent);
 

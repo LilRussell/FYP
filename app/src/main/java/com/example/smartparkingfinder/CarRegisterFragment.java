@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -33,6 +34,7 @@ public class CarRegisterFragment extends Fragment {
 
     private Button addCarButton;
     private RecyclerView recyclerView;
+    private TextView txt_carNotice;
     private ArrayList<CarModel> carList;
     private CarRegisterAdapter carAdapter;
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -76,7 +78,7 @@ public class CarRegisterFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_car_register, container, false);
         recyclerView = view.findViewById(R.id.RV_car);
-
+        txt_carNotice = view.findViewById(R.id.txt_carRegisterNotice);
         // Initialize Firebase Database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference carRef = database.getReference("car");
@@ -119,6 +121,12 @@ public class CarRegisterFragment extends Fragment {
 
                 // Notify the RecyclerView adapter that data has changed
                 carAdapter.notifyDataSetChanged();
+                // Check if the carList is empty and show the notice if it is
+                if (carList.isEmpty()) {
+                    txt_carNotice.setVisibility(View.VISIBLE);
+                } else {
+                    txt_carNotice.setVisibility(View.GONE);
+                }
             }
 
             @Override
@@ -193,10 +201,12 @@ public class CarRegisterFragment extends Fragment {
         // Add EditText fields for numberplate and model to the parent layout
         final EditText numberplateEditText = new EditText(contextThemeWrapper);
         numberplateEditText.setHint("Numberplate");
+        numberplateEditText.setTextColor(getResources().getColor(R.color.black));
         parentLayout.addView(numberplateEditText); // Add to parent layout
 
         final EditText modelEditText = new EditText(contextThemeWrapper);
         modelEditText.setHint("Model");
+        modelEditText.setTextColor(getResources().getColor(R.color.black));
         parentLayout.addView(modelEditText); // Add to parent layout
 
         // Set the parent layout as the dialog's view
@@ -209,21 +219,47 @@ public class CarRegisterFragment extends Fragment {
                 String numberplate = numberplateEditText.getText().toString();
                 String model = modelEditText.getText().toString();
                 DatabaseReference carRef = FirebaseDatabase.getInstance().getReference("car");
-                String carId = carRef.push().getKey();
 
-                // Create a new CarModel object
-                CarModel newCar = new CarModel(carId,userID, numberplate, model, false);
-                carRef.child(carId).setValue(newCar);
+                // Check if a car with the same number plate already exists and is owned by the current user
+                carRef.orderByChild("numberplate").equalTo(numberplate).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        boolean carExists = false;
 
-                // Add the newCar to your carList (RecyclerView data source)
-                carList.add(newCar);
+                        for (DataSnapshot carSnapshot : dataSnapshot.getChildren()) {
+                            CarModel existingCar = carSnapshot.getValue(CarModel.class);
 
-                // Notify the RecyclerView adapter that data has changed
-                carAdapter.notifyDataSetChanged();
+                            if (existingCar != null && existingCar.getUserID().equals(userID)) {
+                                // A car with the same number plate and owned by the current user already exists
+                                carExists = true;
+                                break; // Exit the loop
+                            }
+                        }
 
+                        if (carExists) {
+                            // A car with the same number plate and owned by the current user already exists
+                            Toast.makeText(getActivity(), "A car with the same number plate already exists. Please use a different number plate.", Toast.LENGTH_LONG).show();
+                        } else {
+                            // Number plate is unique, proceed with adding the new car
+                            String carId = carRef.push().getKey();
+                            CarModel newCar = new CarModel(carId, userID, numberplate, model, false);
+                            carRef.child(carId).setValue(newCar);
+
+                            // Add the newCar to your carList (RecyclerView data source)
+                            carList.add(newCar);
+
+                            // Notify the RecyclerView adapter that data has changed
+                            carAdapter.notifyDataSetChanged();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        // Handle any errors that occur when reading from the database
+                    }
+                });
             }
         });
-
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
