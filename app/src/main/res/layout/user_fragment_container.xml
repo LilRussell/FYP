@@ -14,11 +14,13 @@
     android:fontFamily="sans-serif-medium"
     android:textColor="@color/black"
     android:gravity="center"
+        android:background="@color/cardColor"
     />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/RV_parking"
         android:layout_width="match_parent"
+        android:layout_above="@+id/imageView2"
         android:layout_height="649dp"
         android:layout_below="@id/txt_parking_count" />
 
@@ -27,17 +29,17 @@
         android:layout_width="match_parent"
         android:layout_height="72dp"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="-6dp"
+
         app:srcCompat="@drawable/gradient_brown" />
 
     <Button
         android:id="@+id/btn_findCard"
         android:layout_width="56dp"
         android:layout_height="44dp"
-        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginEnd="324dp"
-        android:layout_marginBottom="15dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginBottom="24dp"
         android:background="@drawable/search"
         android:gravity="center" />
 
@@ -61,6 +63,15 @@
         android:layout_marginEnd="-15dp"
         android:layout_marginBottom="-18dp"
         android:text="Normal Parking" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txt_parking_count"
+        android:id="@+id/txt_nothing_user_section"
+        android:gravity="center"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="20sp"
+        android:text="Nothing to Show. Admin has not added anything here yet." />
 
     <TextView
         android:id="@+id/textView4"

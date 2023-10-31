@@ -24,11 +24,16 @@
         android:layout_above="@+id/addTabButton"
         android:layout_below="@+id/tabLayout_test"
         />
-    <FrameLayout
-        android:id="@+id/radioGroupContainer"
-        android:layout_width="match_parent"
+
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp" />
+        android:layout_below="@+id/tabLayout_test"
+        android:id="@+id/txt_nothing"
+        android:gravity="center"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="20sp"
+        android:text="Nothing to Show. Add Floor to Start Manage Parking Layout." />
     <Button
         android:id="@+id/addTabButton"
         android:layout_width="wrap_content"

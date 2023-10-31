@@ -178,38 +178,43 @@ public class AdminHomepage extends AppCompatActivity {
                 // Handle OK button click
                 final String userInput = inputEditText.getText().toString();
 
-                // Define the path where you want to check if a camera with the same ID exists
-                DatabaseReference camerasRef = FirebaseDatabase.getInstance().getReference("camera");
+                if (userInput.trim().isEmpty()) {
+                    // Display an error message if the camera ID is empty
+                    Toast.makeText(AdminHomepage.this, "Camera ID cannot be empty.", Toast.LENGTH_LONG).show();
+                } else {
+                    // Define the path where you want to check if a camera with the same ID exists
+                    DatabaseReference camerasRef = FirebaseDatabase.getInstance().getReference("camera");
 
-                // Query the database to check if a camera with the same ID exists
-                camerasRef.orderByKey().equalTo(userInput).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            // A camera with the same ID already exists
-                            Toast.makeText(AdminHomepage.this, "A camera with the same ID already exists. Please use a different Camera ID.", Toast.LENGTH_LONG).show();
-                        } else {
-                            // The Camera ID is unique; proceed with registration
-                            DatabaseReference newCameraRef = camerasRef.child(userInput);
-                            newCameraRef.child("ownedBy").setValue(adminId);
-                            newCameraRef.child("assignedLocation").setValue("None");
-                            newCameraRef.child("assignedCard").setValue("None");
-                            newCameraRef.child("assignedTab").setValue("None");
-                            newCameraRef.child("statusA").setValue("");
-                            newCameraRef.child("statusB").setValue("");
-                            newCameraRef.child("statusC").setValue("");
-                            newCameraRef.child("status").setValue("Offline");
-
-                            // Close the dialog
-                            dialog.dismiss();
+                    // Query the database to check if a camera with the same ID exists
+                    camerasRef.orderByKey().equalTo(userInput).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.exists()) {
+                                // A camera with the same ID already exists
+                                Toast.makeText(AdminHomepage.this, "A camera with the same ID already exists. Please use a different Camera ID.", Toast.LENGTH_LONG).show();
+                            } else {
+                                // The Camera ID is unique; proceed with registration
+                                DatabaseReference newCameraRef = camerasRef.child(userInput);
+                                newCameraRef.child("ownedBy").setValue(adminId);
+                                newCameraRef.child("assignedLocation").setValue("None");
+                                newCameraRef.child("assignedCard").setValue("None");
+                                newCameraRef.child("assignedTab").setValue("None");
+                                newCameraRef.child("statusA").setValue("");
+                                newCameraRef.child("statusB").setValue("");
+                                newCameraRef.child("statusC").setValue("");
+                                newCameraRef.child("status").setValue("Offline");
+                                // Close the dialog
+                                dialog.dismiss();
+                                Toast.makeText(AdminHomepage.this, "Camera Added Successfully.", Toast.LENGTH_LONG).show();
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        // Handle any errors that occur when reading from the database
-                    }
-                });
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            // Handle any errors that occur when reading from the database
+                        }
+                    });
+                }
             }
         });
 

@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.ContextThemeWrapper;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -39,7 +40,7 @@ public class Register extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle("Add New Location ");
+        toolbar.setTitle("Register ");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         txtEditEmail = findViewById(R.id.txtEdit_email);
@@ -132,7 +133,7 @@ public class Register extends AppCompatActivity {
         return null;
     }
     private void showSuccessDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this,R.style.CustomAlertDialogTheme));
         builder.setTitle("Registration Successful!")
                 .setMessage("You have successfully registered.")
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -144,6 +145,14 @@ public class Register extends AppCompatActivity {
                     }
                 });
         AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                // Set text color for positive button
+                positiveButton.setTextColor(getResources().getColor(R.color.black));
+            }
+        });
         dialog.show();
     }
 

@@ -29,9 +29,10 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         HistoryItem historyItem = historyItemList.get(position);
-        String location= historyItem.getLocation()+"/"+historyItem.getFragmentName()+"/"+historyItem.getCardName();
         holder.carNameTextView.setText(historyItem.getCarName());
-        holder.locationTextView.setText(location);
+        holder.locationTextView.setText(historyItem.getLocation());
+        holder.floorTextView.setText(historyItem.getFragmentName());
+        holder.sectionTextView.setText(historyItem.getCardName());
         holder.timeTextView.setText(historyItem.getTimestamp());
     }
 
@@ -42,15 +43,17 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView carNameTextView;
-        TextView locationTextView;
+        TextView locationTextView,floorTextView,sectionTextView;
         TextView timeTextView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             carNameTextView = itemView.findViewById(R.id.txt_car);
-            locationTextView = itemView.findViewById(R.id.txt_parked_at);
+            locationTextView = itemView.findViewById(R.id.txt_parked_at_location);
             timeTextView = itemView.findViewById(R.id.txt_time);
+            floorTextView = itemView.findViewById(R.id.txt_parked_at_floor);
+            sectionTextView = itemView.findViewById(R.id.txt_parked_at_section);
         }
     }
 }

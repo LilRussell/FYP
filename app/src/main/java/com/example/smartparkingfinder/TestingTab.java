@@ -12,6 +12,7 @@ import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -34,6 +35,7 @@ import java.util.Locale;
 public class TestingTab extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager viewPager;
+    private TextView txtNothing;
     private TestTabAdapter adapter;
     private Button addTabButton,addCardButton,deleteTabButton;
     private String locationId,locationName;
@@ -68,9 +70,14 @@ public class TestingTab extends AppCompatActivity {
         addTabButton = findViewById(R.id.addTabButton);
         addCardButton = findViewById(R.id.addParkingBox);
         deleteTabButton = findViewById(R.id.deleteTabButton);
+        txtNothing = findViewById(R.id.txt_nothing);
         // Load tab data and cards for each tab from Firebase
         loadTabsAndCardsFromFirebase(locationRef);
-
+        if(adapter.getCount()>0){
+            txtNothing.setVisibility(View.GONE);
+        }else{
+            txtNothing.setVisibility(View.VISIBLE);
+        }
         addTabButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -79,10 +86,11 @@ public class TestingTab extends AppCompatActivity {
                 int tabCount = tabLayout.getTabCount();
                 // Create an AlertDialog to input the tab title
                 AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(TestingTab.this,R.style.CustomAlertDialogTheme));
-                builder.setTitle("Enter Tab Title");
+                builder.setTitle("Enter Floor Name");
 
                 // Set up the input view
                 final EditText input = new EditText(context);
+                input.setTextColor(getResources().getColor(R.color.black));
                 input.setInputType(InputType.TYPE_CLASS_TEXT);
                 builder.setView(input);
 
@@ -101,7 +109,7 @@ public class TestingTab extends AppCompatActivity {
 
                         } else {
                             // Handle the case where the input is empty
-                            Toast.makeText(context, "Tab title cannot be empty", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "Floor Name cannot be Empty!", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -112,9 +120,22 @@ public class TestingTab extends AppCompatActivity {
                         dialog.cancel();
                     }
                 });
+                AlertDialog dialog = builder.create();
+                dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                    @Override
+                    public void onShow(DialogInterface dialogInterface) {
+                        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                        Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
 
+                        // Set text color for positive button
+                        positiveButton.setTextColor(getResources().getColor(R.color.black));
+
+                        // Set text color for negative button
+                        negativeButton.setTextColor(getResources().getColor(R.color.black));
+                    }
+                });
                 // Show the AlertDialog
-                builder.show();
+                dialog.show();
             }
         });
         addCardButton.setOnClickListener(new View.OnClickListener() {
@@ -137,7 +158,7 @@ public class TestingTab extends AppCompatActivity {
                             Log.d("Database", "Saved Card");
                 }
             else {
-                    Toast.makeText(TestingTab.this, "No tabs added yet. Please add a tab first.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TestingTab.this, "No Floor added yet. Please add a Floor first.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -161,7 +182,7 @@ public class TestingTab extends AppCompatActivity {
                 // Create a confirmation dialog
                 AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(TestingTab.this,R.style.CustomAlertDialogTheme));
                 builder.setTitle("Confirm Deletion");
-                builder.setMessage("Are you sure you want to delete this tab?");
+                builder.setMessage("Are you sure you want to delete this Floor?");
 
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
@@ -178,8 +199,10 @@ public class TestingTab extends AppCompatActivity {
                         tabInfoList.clear();
                         tabCount--; // Decrement the fragment count
                         if (tabCount==0) {
+                            txtNothing.setVisibility(View.VISIBLE);
                             addCardButton.setVisibility(View.GONE);
                         } else {
+                            txtNothing.setVisibility(View.GONE);
                             addCardButton.setVisibility(View.VISIBLE);
                         }
                         viewPager.setOffscreenPageLimit(tabCount);
@@ -202,6 +225,7 @@ public class TestingTab extends AppCompatActivity {
                         for (TabInfo tabInfo : tabInfoList) {
                             tabLayout.addTab(tabLayout.newTab().setText(tabInfo.getTitle()));
                         }
+                        Toast.makeText(TestingTab.this, "Floor Deleted.", Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -211,9 +235,22 @@ public class TestingTab extends AppCompatActivity {
                         // User clicked No, do nothing
                     }
                 });
+                AlertDialog dialog = builder.create();
+                dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                    @Override
+                    public void onShow(DialogInterface dialogInterface) {
+                        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                        Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
 
-                // Show the confirmation dialog
-                builder.create().show();
+                        // Set text color for positive button
+                        positiveButton.setTextColor(getResources().getColor(R.color.black));
+
+                        // Set text color for negative button
+                        negativeButton.setTextColor(getResources().getColor(R.color.black));
+                    }
+                });
+                // Show the AlertDialog
+                dialog.show();
             } else {
                 // Handle the case where currentTabId is null
                 Toast.makeText(TestingTab.this, "Tab ID is null.", Toast.LENGTH_SHORT).show();
@@ -221,7 +258,7 @@ public class TestingTab extends AppCompatActivity {
         } else {
             // Handle the case where currentItem is out of bounds
 
-            Toast.makeText(TestingTab.this, "Invalid tab index.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(TestingTab.this, "No Floor Found.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -277,6 +314,7 @@ public class TestingTab extends AppCompatActivity {
         fragments.add(fragment);
         adapter.notifyDataSetChanged();
         if (adapter.getCount()>0) {
+            txtNothing.setVisibility(View.GONE);
             addCardButton.setVisibility(View.VISIBLE);
         }
     }
@@ -293,7 +331,7 @@ public class TestingTab extends AppCompatActivity {
 
         if (isTabTitleExists) {
             // Show an error message or handle the case where a similar tab title exists
-            Toast.makeText(this, "Tab title already exists", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Floor Name already exists", Toast.LENGTH_SHORT).show();
         } else {
             // Create a new tab if the title is unique
             FirebaseDatabase database = FirebaseDatabase.getInstance();

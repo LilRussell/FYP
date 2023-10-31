@@ -13,7 +13,7 @@
 
     <RelativeLayout
         android:id="@+id/RL_card"
-        android:layout_width="407dp"
+        android:layout_width="match_parent"
         android:layout_height="330dp">
 
         <ImageView

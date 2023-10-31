@@ -39,8 +39,8 @@ public class AdminGraphAdapter extends RecyclerView.Adapter<AdminGraphAdapter.Vi
 
         // Set data for the CardView
         holder.titleTextView.setText(item.getTitle());
-        holder.xAxisLabel.setText(item.getXAxisLabel());
-        holder.yAxisLabel.setText(item.getYAxisLabel());
+        holder.xAxisLabel.setText("X:Every 30 Minutes");
+        holder.yAxisLabel.setText("Y: Parking Available");
         setupLineChart(holder.lineChart, item.getChartData());
     }
 
@@ -65,7 +65,7 @@ public class AdminGraphAdapter extends RecyclerView.Adapter<AdminGraphAdapter.Vi
     }
     private void setupLineChart(LineChart lineChart, List<Entry> chartData) {
         // Create a LineDataSet with the chart data
-        LineDataSet dataSet = new LineDataSet(chartData, "Data Set Name");
+        LineDataSet dataSet = new LineDataSet(chartData, "Parking Available");
 
         // Customize the dataSet (e.g., set colors, labels, etc.)
         dataSet.setColor(Color.BLUE); // Set the line color
@@ -79,6 +79,7 @@ public class AdminGraphAdapter extends RecyclerView.Adapter<AdminGraphAdapter.Vi
         // Create a LineData object with the dataSet
         LineData lineData = new LineData(dataSet);
         lineChart.setDrawBorders(true);
+
         lineChart.setBorderWidth(1f);
         lineChart.getAxisLeft().setAxisMinimum(0f); // Set the minimum value on the left Y-axis to 0
         lineChart.getAxisRight().setEnabled(false); // Disable the right Y-axis

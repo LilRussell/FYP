@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
@@ -36,7 +37,7 @@ public class User_Parking_Location extends AppCompatActivity {
     private ViewPager viewPager;
     private UserTabAdapter adapter;
     private String locationId,locationName,userID;
-
+private TextView txtNothing;
     private Toolbar toolbar;
     private int count=0;
     private int tabCount=0;
@@ -61,7 +62,7 @@ public class User_Parking_Location extends AppCompatActivity {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference locationRef = database.getReference("location").child(locationId);
         adapter = new UserTabAdapter(getSupportFragmentManager());
-
+        txtNothing = findViewById(R.id.txt_nothing_user);
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
 
@@ -88,6 +89,11 @@ public class User_Parking_Location extends AppCompatActivity {
         // Add the fragment to the adapter and notify the adapter of the data set change
         adapter.addFragment(fragment, tabTitle);
         adapter.notifyDataSetChanged();
+        if(adapter.getCount()>0){
+            txtNothing.setVisibility(View.GONE);
+        }else{
+            txtNothing.setVisibility(View.VISIBLE);
+        }
     }
 
     private void loadTabsAndCardsFromFirebase(DatabaseReference locationRef) {

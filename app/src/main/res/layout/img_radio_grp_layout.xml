@@ -3,12 +3,13 @@
     android:id="@+id/radioGroup_ImgParking"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/cardColor"
     android:orientation="vertical">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/custom_title"
-        android:text="@string/select_a_camera_to_bind"
+        android:text="@string/choose_parking_type"
         android:fontFamily="sans-serif-medium"
         android:textSize="20sp"
         />

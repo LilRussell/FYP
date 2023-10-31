@@ -12,9 +12,9 @@
     <FrameLayout
         android:id="@+id/fragment_container_admin"
         android:layout_width="410dp"
-        android:layout_height="700dp"
-        android:layout_above="@+id/bottomNavMain"
+        android:layout_height="match_parent"
         android:layout_below="@+id/toolbar"
+        android:layout_above="@+id/bottomNavMain_admin"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginStart="1dp"

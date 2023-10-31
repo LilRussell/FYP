@@ -813,7 +813,7 @@ public class TestFragment extends Fragment {
         currentCardId = cardId;
         parkingSlot = Slot;
         // Create an AlertDialog builder
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(requireContext(),R.style.CustomAlertDialogTheme));
 
         // Inflate the custom dialog layout
         View customView = getLayoutInflater().inflate(R.layout.img_radio_grp_layout, null);
@@ -823,7 +823,6 @@ public class TestFragment extends Fragment {
         final int[] selectedOption = {0};
 
         builder.setView(customView)
-                .setTitle("Select an option")
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -855,6 +854,17 @@ public class TestFragment extends Fragment {
 
         // Create and show the dialog
         AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                // Set text color for negative button
+                positiveButton.setTextColor(getResources().getColor(R.color.black));
+                Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+                // Set text color for negative button
+                negativeButton.setTextColor(getResources().getColor(R.color.black));
+            }
+        });
         dialog.show();
     }
     private void updateImageBasedOnOption(String selectedOptionText, String parkingSlot) {

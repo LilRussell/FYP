@@ -48,7 +48,7 @@
                 android:layout_width="300dp"
                 android:layout_height="50dp"
                 android:hint="@string/email"
-                android:text="admin1@gmail.com"
+                android:text="user@gmail.com"
                 android:ems="10"
                 android:inputType="textEmailAddress"
                 android:textColor="@color/black"

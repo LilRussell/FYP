@@ -31,17 +31,34 @@ public class CameraAdapter extends RecyclerView.Adapter<CameraAdapter.CameraView
 
         String locationName = camera.getLocationName();
         String location;
-
+        String floor;
+        String section;
+        String floorName = camera.getFloorName();
+        String sectionName = camera.getCardName();
         if (locationName != null) {
-            location = locationName + "/" + camera.getFloorName() + "/" + camera.getCardName();
+            location = locationName;
         } else {
             location = "Not Linked.";
+        }
+
+        if (floorName != null) {
+            floor = floorName;
+        } else {
+            floor = "Not Linked.";
+        }
+
+        if (sectionName != null) {
+            section = sectionName;
+        } else {
+            section = "Not Linked.";
         }
 
         // Set camera information to the views
         holder.txtCameraName.setText(camera.getCameraName());
         holder.txtCameraLocation.setText(location);
         holder.txtCameraStatus.setText(camera.getStatus());
+        holder.txtCameraFloor.setText(floor);
+        holder.txtCameraSection.setText(section);
     }
 
     @Override
@@ -50,13 +67,16 @@ public class CameraAdapter extends RecyclerView.Adapter<CameraAdapter.CameraView
     }
 
     public class CameraViewHolder extends RecyclerView.ViewHolder {
-        public TextView txtCameraName, txtCameraLocation, txtCameraStatus;
+        public TextView txtCameraName, txtCameraLocation,txtCameraFloor,txtCameraSection, txtCameraStatus;
 
         public CameraViewHolder(View itemView) {
             super(itemView);
             txtCameraName = itemView.findViewById(R.id.txt_camera_name);
             txtCameraLocation = itemView.findViewById(R.id.txt_camera_location);
             txtCameraStatus = itemView.findViewById(R.id.txt_camera_status);
+            txtCameraFloor = itemView.findViewById(R.id.txt_camera_floor);
+            txtCameraSection = itemView.findViewById(R.id.txt_camera_section);
+
         }
     }
 }

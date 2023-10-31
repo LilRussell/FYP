@@ -24,6 +24,15 @@
 
         android:layout_below="@+id/tabLayout_test"
        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tabLayout_test"
+        android:id="@+id/txt_nothing_user"
+        android:gravity="center"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="20sp"
+        android:text="Nothing to Show. Admin has not added anything here yet." />
     <FrameLayout
         android:id="@+id/radioGroupContainer"
         android:layout_width="match_parent"

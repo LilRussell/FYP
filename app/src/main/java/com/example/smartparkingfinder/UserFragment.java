@@ -57,7 +57,7 @@ public class UserFragment extends Fragment {
     private ValueEventListener cameraListener;
     private Button findCardButton,findNormalButton,findDisabledButton;
     private int lastScrolledPosition = -1;
-    private TextView parkingCount;
+    private TextView parkingCount,txtNothing;
     private String fragmentName;
     private String userID ;
     private String tabtitle;
@@ -84,6 +84,7 @@ public class UserFragment extends Fragment {
         recyclerView = view.findViewById(R.id.RV_parking);
         parkingCount = view.findViewById(R.id.txt_parking_count);
         cardItemList = new ArrayList<>();
+        txtNothing=view.findViewById(R.id.txt_nothing_user_section);
         adapter = new UserCardAdapter(cardItemList, fragment,recyclerView); // Pass the context
 
         // Set up the RecyclerView
@@ -230,7 +231,11 @@ public class UserFragment extends Fragment {
 
         // Notify the adapter of the data change
         adapter.notifyDataSetChanged();
-
+        if(adapter.getItemCount()>0||!cardItemList.isEmpty()){
+            txtNothing.setVisibility(View.GONE);
+        }else{
+            txtNothing.setVisibility(View.VISIBLE);
+        }
         // Print the card IDs and the count of items in the list
         for (UserCardItem item : cardItemList) {
             Log.d("CardItemID", "Card ID: " + item.getCardId());
@@ -425,14 +430,19 @@ public class UserFragment extends Fragment {
 
                             if (imageUrl != null) {
                                 // Create an alert dialog
-                                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-                                builder.setTitle("Image Preview");
+                                AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(recyclerView.getContext(),R.style.CustomAlertDialogTheme));
+                                builder.setTitle("Where is the location?");
 
                                 // Create an ImageView to display the image
                                 ImageView imageView = new ImageView(requireContext());
 
+
                                 // Load the image into the ImageView using Picasso or any other image loading library
                                 Picasso.get().load(imageUrl).into(imageView);
+                                imageView.setLayoutParams(new ViewGroup.LayoutParams(
+                                        ViewGroup.LayoutParams.MATCH_PARENT,
+                                        ViewGroup.LayoutParams.MATCH_PARENT
+                                ));
 
                                 // Add the ImageView to the dialog's layout
                                 builder.setView(imageView);
@@ -442,14 +452,21 @@ public class UserFragment extends Fragment {
 
                                 // Create and show the AlertDialog
                                 AlertDialog dialog = builder.create();
+                                dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                                    @Override
+                                    public void onShow(DialogInterface dialogInterface) {
+
+                                        Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+                                        // Set text color for negative button
+                                        negativeButton.setTextColor(getResources().getColor(R.color.black));
+                                    }
+                                });
                                 dialog.show();
                             } else {
-                                // Handle the case where imageUrl is null (no image available for this card)
-                                // You can show a message to the user or take other appropriate actions.
+                                Toast.makeText(requireContext(), "No Information Added.", Toast.LENGTH_SHORT).show();
                             }
                         } else {
-                            // Handle the case where the cardId doesn't exist in the database
-                            // You can show an error message or take other appropriate actions.
+
                         }
                     }
 
