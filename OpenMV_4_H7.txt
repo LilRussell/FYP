@@ -1,0 +1,283 @@
+import sensor, image, time, os, tf, math, uos, gc, socket, network
+
+# ESP8266 IP address and port
+esp8266_ip = "--"  # Replace with your ESP8266's IP address
+esp8266_port = --  # Replace with the port number you want to use
+
+# Initialize Wi-Fi interface
+wlan = network.WINC(mode=network.WINC.MODE_STA)
+wlan.connect("--", "--")
+while not wlan.isconnected():
+    pass
+
+# Create a UDP socket
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+sensor.reset()                         # Reset and initialize the sensor.
+sensor.set_pixformat(sensor.GRAYSCALE)  # Set pixel format to grayscale
+sensor.set_framesize(sensor.QVGA)      # Set frame size to QVGA (320x240)
+sensor.set_windowing((240, 240))       # Set 240x240 window.
+sensor.skip_frames(time=1000)          # Let the camera adjust.
+
+# Define the dimensions and positions of the ROIs
+roi1_x = 0
+roi1_y = 40
+roi1_width = 80
+roi1_height = 160
+
+# Gap between ROIs
+roi_gap = 3
+
+# Calculate the positions of ROI 2 and ROI 3
+roi2_x = roi1_x + roi1_width + roi_gap
+roi2_y = roi1_y
+roi2_width = roi1_width
+roi2_height = roi1_height
+
+roi3_x = roi2_x + roi2_width + roi_gap
+roi3_y = roi1_y
+roi3_width = roi1_width
+roi3_height = roi1_height
+
+net = None
+labels = None
+min_confidence = 0.5
+
+try:
+    # Load the model, alloc the model file on the heap if we have at least 64K free after loading
+    net = tf.load("trained.tflite", load_to_fb=uos.stat('trained.tflite')[6] > (gc.mem_free() - (64*1024)))
+except Exception as e:
+    raise Exception('Failed to load "trained.tflite", did you copy the .tflite and labels.txt file onto the mass-storage device? (' + str(e) + ')')
+
+try:
+    labels = [line.rstrip('\n') for line in open("labels.txt")]
+except Exception as e:
+    raise Exception('Failed to load "labels.txt", did you copy the .tflite and labels.txt file onto the mass-storage device? (' + str(e) + ')')
+
+colors = [ # Add more colors if you are detecting more than 7 types of classes at once.
+    (255,   0,   0),
+    (  0, 255,   0),
+    (255, 255,   0),
+    (  0,   0, 255),
+    (255,   0, 255),
+    (  0, 255, 255),
+    (255, 255, 255),
+]
+roi1 = (roi1_x, roi1_y, roi1_width, roi1_height)
+roi2 = (roi2_x, roi2_y, roi2_width, roi2_height)
+roi3 = (roi3_x, roi3_y, roi3_width, roi3_height)
+clock = time.clock()
+
+# Open a text file for writing results
+result_file = open("results.txt", "w")
+
+statusA = False
+statusB = False
+statusC = False
+# Define the number of consecutive detections required for confirmation
+consecutive_detections_required = 3  # Adjust as needed
+
+# Initialize counters for consecutive detections
+consecutive_detections_count_roi1 = 0
+consecutive_detections_count_roi2 = 0
+consecutive_detections_count_roi3 = 0
+
+# Initialize counters for consecutive non-detections (empty status)
+consecutive_empty_count_roi1 = 0
+consecutive_empty_count_roi2 = 0
+consecutive_empty_count_roi3 = 0
+def send_packet_to_esp():
+    try:
+        # Create a UDP socket
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        packet = "Hello from camera"  # Define the packet to send
+
+        # Send the packet to the ESP8266
+        sock.sendto(packet.encode(), (esp8266_ip, esp8266_port))
+        print("Packet sent to ESP:", packet)
+        sock.close()
+    except Exception as e:
+        print("Error sending packet to ESP:", e)
+# Main loop
+last_packet_time = time.time()
+packet_interval = 5  # 30 seconds
+while True:
+    clock.tick()
+    img = sensor.snapshot()
+    current_time = time.time()
+
+    # Check if it's time to send a packet to the ESP
+    if current_time - last_packet_time >= packet_interval:
+        send_packet_to_esp()
+        last_packet_time = current_time
+
+    # Initialize paths for each ROI
+    path1 = "statusA"
+    path2 = "statusB"
+    path3 = "statusC"
+
+    car_detected1 = False
+    car_detected2 = False
+    car_detected3 = False
+    img.draw_rectangle(roi1, color=(0, 255, 0))  # Green rectangle for ROI 1
+    img.draw_rectangle(roi2, color=(0, 255, 0))  # Green rectangle for ROI 2
+    img.draw_rectangle(roi3, color=(0, 255, 0))  # Green rectangle for ROI 3
+    # Detect cars in ROI 1
+
+    for j, detection_list in enumerate(net.detect(img, thresholds=[(math.ceil(min_confidence * 255), 255)], roi=roi1)):
+        if (j == 0): continue  # Background class
+        if (len(detection_list) == 0): continue  # No detections for this class?
+
+        print("********** %s Detected in ROI 1 **********" % (labels[j]))
+        consecutive_detections_count_roi1 += 1
+
+        # If the required number of consecutive detections is reached, update the status
+        if consecutive_detections_count_roi1 >= consecutive_detections_required:
+            car_detected1 = True
+
+            for d in detection_list:
+                [x, y, w, h] = d.rect()
+                center_x = math.floor(x + (w / 2))
+                center_y = math.floor(y + (h / 2))
+
+                # Scale the coordinates to be within ROI 1.
+                scale_factor_x = roi1_width / sensor.width()
+                scale_factor_y = roi1_height / sensor.height()
+                center_x_roi = int(roi1[0] + center_x * scale_factor_x)
+                center_y_roi = int(roi1[1] + center_y * scale_factor_y)
+
+                print('x %d\ty %d' % (center_x, center_y))
+                img.draw_circle((center_x_roi, center_y_roi, 30), color=colors[j], thickness=2)
+        consecutive_empty_count_roi1 = 0
+        if len(detection_list) == 0:
+            consecutive_empty_count_roi1 += 1
+
+            # If the required number of consecutive empty statuses is reached, update the status
+            if consecutive_empty_count_roi1 >= consecutive_detections_required:
+                car_detected1 = False
+
+        # If car is detected, reset the consecutive empty counter
+        if car_detected1:
+            consecutive_empty_count_roi1 = 0
+        # Send data to ESP8266 for ROI 1 if not already sent
+        if car_detected1 and not statusA:
+           data1 = "Occupied"
+           sock.sendto(("path=%s&data=%s" % (path1, data1)).encode(), (esp8266_ip, esp8266_port))
+           result_file.write("Data sent - Path: %s, Data: %s\n" % (path1, data1))
+           statusA = True
+        elif not car_detected1:
+           statusA = False
+
+       # Detect cars in ROI 2
+    for j, detection_list in enumerate(net.detect(img, thresholds=[(math.ceil(min_confidence * 255), 255)], roi=roi2)):
+        if (j == 0): continue  # Background class
+        if (len(detection_list) == 0): continue  # No detections for this class?
+
+        print("********** %s Detected in ROI 2 **********" % (labels[j]))
+        consecutive_detections_count_roi2 += 1
+
+        # If the required number of consecutive detections is reached, update the status
+        if consecutive_detections_count_roi2 >= consecutive_detections_required:
+            car_detected2 = True
+
+            for d in detection_list:
+                [x, y, w, h] = d.rect()
+                center_x = math.floor(x + (w / 2))
+                center_y = math.floor(y + (h / 2))
+
+                # Scale the coordinates to be within ROI 2.
+                scale_factor_x = roi2_width / sensor.width()
+                scale_factor_y = roi2_height / sensor.height()
+                center_x_roi = int(roi2[0] + center_x * scale_factor_x)
+                center_y_roi = int(roi2[1] + center_y * scale_factor_y)
+
+                print('x %d\ty %d' % (center_x, center_y))
+                img.draw_circle((center_x_roi, center_y_roi, 30), color=colors[j], thickness=2)
+        consecutive_empty_count_roi2 = 0
+        if len(detection_list) == 0:
+            consecutive_empty_count_roi2 += 1
+
+            # If the required number of consecutive empty statuses is reached, update the status
+            if consecutive_empty_count_roi2 >= consecutive_detections_required:
+                car_detected2 = False
+
+        # If car is detected, reset the consecutive empty counter
+        if car_detected2:
+            consecutive_empty_count_roi2 = 0
+            # Send data to ESP8266 for ROI 2 if not already sent
+            if car_detected2 and not statusB:
+                data2 = "Occupied"
+                sock.sendto(("path=%s&data=%s" % (path2, data2)).encode(), (esp8266_ip, esp8266_port))
+                result_file.write("Data sent - Path: %s, Data: %s\n" % (path2, data2))
+                statusB = True
+            elif not car_detected2:
+                statusB = False
+
+       # Detect cars in ROI 3
+    for j, detection_list in enumerate(net.detect(img, thresholds=[(math.ceil(min_confidence * 255), 255)], roi=roi3)):
+        if (j == 0): continue  # Background class
+        if (len(detection_list) == 0): continue  # No detections for this class?
+
+        print("********** %s Detected in ROI 3 **********" % (labels[j]))
+        consecutive_detections_count_roi1 += 1
+
+        # If the required number of consecutive detections is reached, update the status
+        if consecutive_detections_count_roi1 >= consecutive_detections_required:
+            car_detected3 = True
+
+            for d in detection_list:
+                [x, y, w, h] = d.rect()
+                center_x = math.floor(x + (w / 2))
+                center_y = math.floor(y + (h / 2))
+
+                # Scale the coordinates to be within ROI 3.
+                scale_factor_x = roi3_width / sensor.width()
+                scale_factor_y = roi3_height / sensor.height()
+                center_x_roi = int(roi3[0] + center_x * scale_factor_x)
+                center_y_roi = int(roi3[1] + center_y * scale_factor_y)
+
+                print('x %d\ty %d' % (center_x, center_y))
+                img.draw_circle((center_x_roi, center_y_roi, 30), color=colors[j], thickness=2)
+        consecutive_empty_count_roi3 = 0
+        if len(detection_list) == 0:
+            consecutive_empty_count_roi3 += 1
+
+            # If the required number of consecutive empty statuses is reached, update the status
+            if consecutive_empty_count_roi3 >= consecutive_detections_required:
+                car_detected3 = False
+
+        # If car is detected, reset the consecutive empty counter
+        if car_detected3:
+            consecutive_empty_count_roi3 = 0
+            # Send data to ESP8266 for ROI 3 if not already sent
+            if car_detected3 and not statusC:
+                data3 = "Occupied"
+                sock.sendto(("path=%s&data=%s" % (path3, data3)).encode(), (esp8266_ip, esp8266_port))
+                result_file.write("Data sent - Path: %s, Data: %s\n" % (path3, data3))
+                statusC = True
+            elif not car_detected3:
+                statusC = False
+
+    # Send "Empty" status if no car is detected and status is not already False
+    if not car_detected1 and statusA:
+        data1 = "Empty"
+        sock.sendto(("path=%s&data=%s" % (path1, data1)).encode(), (esp8266_ip, esp8266_port))
+        result_file.write("Data sent - Path: %s, Data: %s\n" % (path1, data1))
+        statusA = False
+
+    if not car_detected2 and statusB:
+        data2 = "Empty"
+        sock.sendto(("path=%s&data=%s" % (path2, data2)).encode(), (esp8266_ip, esp8266_port))
+        result_file.write("Data sent - Path: %s, Data: %s\n" % (path2, data2))
+        statusB = False
+
+    if not car_detected3 and statusC:
+        data3 = "Empty"
+        sock.sendto(("path=%s&data=%s" % (path3, data3)).encode(), (esp8266_ip, esp8266_port))
+        result_file.write("Data sent - Path: %s, Data: %s\n" % (path3, data3))
+        statusC = False
+    # Flush the file buffer to ensure data is written immediately
+    result_file.flush()
+
+# Close the text file when finished
+result_file.close()
