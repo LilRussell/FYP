@@ -44,7 +44,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
         locationRVModel locationRVModel = data.get(position);
         holder.locationTextView.setText(locationRVModel.getName());
         holder.descriptionTextView.setText(locationRVModel.getDescription());
-        holder.parkingAvailabilityTextView.setText("Parking Availability: " + locationRVModel.getParkingAvailability());
+        holder.parkingAvailabilityTextView.setText("Parking Available: " + locationRVModel.getParkingAvailability());
 
         // Load and display the image using Glide or a similar image loading library
         Glide.with(context)

@@ -38,7 +38,7 @@ public class RecentAdapter extends RecyclerView.Adapter<RecentAdapter.ViewHolder
     public void onBindViewHolder(@NonNull RecentAdapter.ViewHolder holder, int position) {
         locationRVModel locationRVModel = data.get(position);
         holder.locationTextView.setText(locationRVModel.getName());
-        holder.parkingAvailabilityTextView.setText("Parking Availability: " + locationRVModel.getParkingAvailability());
+        holder.parkingAvailabilityTextView.setText("Parking Available: " + locationRVModel.getParkingAvailability());
 
         // Load and display the image using Glide or a similar image loading library
         Glide.with(context)

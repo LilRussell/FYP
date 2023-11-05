@@ -128,7 +128,7 @@ private TextView txtNothing;
         });
     }
 
-    private void loadCardDataFromFirebase(DatabaseReference locationRef,String tabID, String tabTitle) {
+    private void loadCardDataFromFirebase(DatabaseReference locationRef, String tabID, String tabTitle) {
         DatabaseReference cardsRef = locationRef.child("details").child("layout").child(tabID).child("card");
         cardsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -137,31 +137,49 @@ private TextView txtNothing;
                     if (cardSnapshot.hasChild("selectedCamera")) {
                         String selectedCamera = cardSnapshot.child("selectedCamera").getValue(String.class);
                         if (selectedCamera != null && !selectedCamera.equals("")) {
-                            String cardId = cardSnapshot.getKey(); // Get the unique card ID
-                            String cardText = cardSnapshot.child("cardText").getValue(String.class);
-                            String cardCamera = cardSnapshot.child("selectedCamera").getValue(String.class);
-                            String cardP1 = cardSnapshot.child("cardP1").getValue(String.class);
-                            String cardP2 = cardSnapshot.child("cardP2").getValue(String.class);
-                            String cardP3 = cardSnapshot.child("cardP3").getValue(String.class);
-                            String statusP1 = cardSnapshot.child("statusP1").getValue(String.class);
-                            String statusP2 = cardSnapshot.child("statusP2").getValue(String.class);
-                            String statusP3 = cardSnapshot.child("statusP3").getValue(String.class);
-                            // Create a CardItem object with the retrieved data
-                            UserCardItem cardItem = new UserCardItem(cardId, cardText);
-                            cardItem.setSelectedCamera(cardCamera);
-                            cardItem.setCardP1(cardP1);
-                            cardItem.setCardP2(cardP2);
-                            cardItem.setCardP3(cardP3);
-                            cardItem.setStatusP1(statusP1);
-                            cardItem.setStatusP2(statusP2);
-                            cardItem.setStatusP3(statusP3);
-                            cardItem.setDefaultCar("Test");
-                            cardItem.setCardName("Test");
-                            cardItem.setFragmentName("Test");
-                            updateFragmentUI(tabTitle, cardItem);
+                            // Construct the path to the camera's status
+                            DatabaseReference cameraStatusRef = FirebaseDatabase.getInstance().getReference().child("camera").child(selectedCamera).child("status");
+
+                            // Check if the status is "Online" for the selected camera
+                            cameraStatusRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot cameraStatusSnapshot) {
+                                    String cameraStatus = cameraStatusSnapshot.getValue(String.class);
+                                    if ("Online".equals(cameraStatus)) {
+                                        // The selected camera is online, proceed to fetch and display the card
+                                        String cardId = cardSnapshot.getKey(); // Get the unique card ID
+                                        String cardText = cardSnapshot.child("cardText").getValue(String.class);
+                                        String cardCamera = cardSnapshot.child("selectedCamera").getValue(String.class);
+                                        String cardP1 = cardSnapshot.child("cardP1").getValue(String.class);
+                                        String cardP2 = cardSnapshot.child("cardP2").getValue(String.class);
+                                        String cardP3 = cardSnapshot.child("cardP3").getValue(String.class);
+                                        String statusP1 = cardSnapshot.child("statusP1").getValue(String.class);
+                                        String statusP2 = cardSnapshot.child("statusP2").getValue(String.class);
+                                        String statusP3 = cardSnapshot.child("statusP3").getValue(String.class);
+
+                                        // Create a CardItem object with the retrieved data
+                                        UserCardItem cardItem = new UserCardItem(cardId, cardText);
+                                        cardItem.setSelectedCamera(cardCamera);
+                                        cardItem.setCardP1(cardP1);
+                                        cardItem.setCardP2(cardP2);
+                                        cardItem.setCardP3(cardP3);
+                                        cardItem.setStatusP1(statusP1);
+                                        cardItem.setStatusP2(statusP2);
+                                        cardItem.setStatusP3(statusP3);
+                                        cardItem.setDefaultCar("Test");
+                                        cardItem.setCardName("Test");
+                                        cardItem.setFragmentName("Test");
+                                        updateFragmentUI(tabTitle, cardItem);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+                                    // Handle error
+                                }
+                            });
                         }
                     }
-
                 }
             }
 

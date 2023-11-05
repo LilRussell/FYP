@@ -93,6 +93,7 @@ public class UserFragment extends Fragment {
         findCardButton= view.findViewById(R.id.btn_findCard);
         findNormalButton= view.findViewById(R.id.btn_findNormalCard);
         findDisabledButton= view.findViewById(R.id.btn_findDisabledCard);
+        updateParkingCount();
         findCardButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -177,9 +178,10 @@ public class UserFragment extends Fragment {
                         }
                     }
                 }
+                updateParkingCount();
                 // Notify the adapter that the data has changed
                 adapter.notifyDataSetChanged();
-                updateParkingCount();
+
             }
 
             @Override
@@ -190,6 +192,7 @@ public class UserFragment extends Fragment {
 
 // Add the ValueEventListener to the cameraRef
         cameraRef.addValueEventListener(cameraListener);
+
         return view;
     }
     @Override
@@ -228,7 +231,7 @@ public class UserFragment extends Fragment {
     public void addCardToRecyclerView(UserCardItem cardItem) {
         // Add the provided CardItem to the adapter's data list
         cardItemList.add(cardItem);
-
+        updateParkingCount();
         // Notify the adapter of the data change
         adapter.notifyDataSetChanged();
         if(adapter.getItemCount()>0||!cardItemList.isEmpty()){
@@ -243,7 +246,7 @@ public class UserFragment extends Fragment {
 
         Log.d("CardItemCount", "Number of items in cardItemList: " + cardItemList.size());
     }
-    private void updateParkingCount() {
+    public void updateParkingCount() {
         int totalOccupiedCount = 0;
         int totalEmptyCount = 0;
 

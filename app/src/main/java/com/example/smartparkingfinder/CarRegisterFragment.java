@@ -205,7 +205,7 @@ public class CarRegisterFragment extends Fragment {
         parentLayout.addView(numberplateEditText); // Add to parent layout
 
         final EditText modelEditText = new EditText(contextThemeWrapper);
-        modelEditText.setHint("Model");
+        modelEditText.setHint("Model(Optional)");
         modelEditText.setTextColor(getResources().getColor(R.color.black));
         parentLayout.addView(modelEditText); // Add to parent layout
 
@@ -216,8 +216,8 @@ public class CarRegisterFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // Get the values from EditText fields
-                String numberplate = numberplateEditText.getText().toString();
-                String model = modelEditText.getText().toString();
+                String numberplate = numberplateEditText.getText().toString().trim();
+                String model = modelEditText.getText().toString().trim();
                 DatabaseReference carRef = FirebaseDatabase.getInstance().getReference("car");
 
                 // Check if a car with the same number plate already exists and is owned by the current user
@@ -239,7 +239,10 @@ public class CarRegisterFragment extends Fragment {
                         if (carExists) {
                             // A car with the same number plate and owned by the current user already exists
                             Toast.makeText(getActivity(), "A car with the same number plate already exists. Please use a different number plate.", Toast.LENGTH_LONG).show();
-                        } else {
+                        }else if(numberplate.isEmpty()){
+                            Toast.makeText(getActivity(), "Number Plate is required.", Toast.LENGTH_LONG).show();
+                        }
+                        else {
                             // Number plate is unique, proceed with adding the new car
                             String carId = carRef.push().getKey();
                             CarModel newCar = new CarModel(carId, userID, numberplate, model, false);
