@@ -71,8 +71,7 @@ public class AdminHomepage extends AppCompatActivity {
         argsH.putString("adminID", adminId);
         adminHomeFragment.setArguments(argsH);
         loadFragment(adminHomeFragment);
-
-        // Initialize your bottomNavigationView and set up its listener
+        // Initialize the bottomNavigationView and set up its listener
         bottomNavigationView = findViewById(R.id.bottomNavMain_admin);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -86,10 +85,8 @@ public class AdminHomepage extends AppCompatActivity {
                         adminHomeFragment.setArguments(argsH);
                         loadFragment(adminHomeFragment);
                         toolbar.setTitle("Smart Parking Finder");
-                        // Replace the fragment container with the HomeFragment if needed
                         return true;
                     case R.id.camera:
-                        // Handle the location tab
                         AdminCameraFragment adminCameraFragment = new AdminCameraFragment();
                         Bundle args = new Bundle();
                         args.putString("adminID", adminId); // Pass the UID to the fragment
@@ -97,19 +94,13 @@ public class AdminHomepage extends AppCompatActivity {
                         loadFragment(adminCameraFragment);
                         toolbar.setTitle("Camera List");
                         return true;
-
                     case R.id.statistic:
-                        // Handle the profile tab
-
                         AdminStatisticFragment adminStatisticFragment = new AdminStatisticFragment();
                         Bundle argsHis = new Bundle();
                         argsHis.putString("adminID", adminId);
                         adminStatisticFragment.setArguments(argsHis);
                         loadFragment(adminStatisticFragment);
-
                         toolbar.setTitle("Statistics");
-                        // Replace the fragment container with the ProfileFragment if needed
-
                         return true;
                 }
                 return false;

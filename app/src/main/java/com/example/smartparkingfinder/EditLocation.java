@@ -172,7 +172,7 @@ public class EditLocation extends AppCompatActivity {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                     // The name remains unchanged, proceed with updating
-                                    if (filePath != null) {
+                                    if (filePath != null&&locationName!=null&&locationDescription!=null) {
                                         // Reference to the location under "location/id/details"
                                         DatabaseReference locationDetailsRef = mDatabase.child("location").child(locationId).child("details");
 
@@ -202,7 +202,9 @@ public class EditLocation extends AppCompatActivity {
                                                     Toast.makeText(getApplicationContext(), "Failed to upload image: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                                 });
 
-                                }
+                                }else{
+                                        Toast.makeText(getApplicationContext(),"Inputs can't be Empty.",Toast.LENGTH_LONG).show();
+                                    }
 
                             }
 
