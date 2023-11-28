@@ -331,6 +331,7 @@ public class UserFragment extends Fragment {
                 cardItem.setHighlighted(true);
                 // Notify the adapter to update the view
                 adapter.notifyDataSetChanged();
+                Toast.makeText(requireContext(), "Parking Found at: "+cardItem.getCardText(), Toast.LENGTH_SHORT).show();
                 lastScrolledPosition = i; // Update the last scrolled position
                 return; // Stop searching after the first card with an empty slot is found
             }
